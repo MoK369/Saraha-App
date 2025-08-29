@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { SchemaTypes } from "mongoose";
 import { genderEnum } from "../../utils/constants/enum.constants.js";
+import { decryptText } from "../../utils/security/encrypt.security.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -46,8 +47,25 @@ userSchema
     this.set({ firstName, lastName });
   })
   .get(function () {
-    return `${this.firstName}  ${this.lastName}`;
+    return `${this.firstName} ${this.lastName}`;
   });
+
+userSchema.methods.toJSON = function () {
+  const { id, fullName, ...restObj } = this.toObject();
+  delete restObj._id;
+  delete restObj.firstName;
+  delete restObj.lastName;
+  delete restObj.password;
+  restObj.phone = decryptText({
+    ciphertext: restObj.phone,
+    secretKey:process.env.SECRETE_KEY,
+  });
+  return {
+    id,
+    fullName,
+    ...restObj,
+  };
+};
 
 const UserModel = mongoose.model("User", userSchema);
 
