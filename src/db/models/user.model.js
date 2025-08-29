@@ -1,5 +1,5 @@
-import mongoose, { SchemaTypes } from "mongoose";
-import { genderEnum } from "../../utils/constants/enum.constants.js";
+import mongoose from "mongoose";
+import { genderEnum, roleEnum } from "../../utils/constants/enum.constants.js";
 import { decryptText } from "../../utils/security/encrypt.security.js";
 
 const userSchema = new mongoose.Schema(
@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(genderEnum),
       default: genderEnum.male,
     },
+    role: {
+      type: String,
+      enum: Object.values(roleEnum),
+      default: roleEnum.user,
+    },
     phone: String,
     confirmEmail: Date,
   },
@@ -58,7 +63,7 @@ userSchema.methods.toJSON = function () {
   delete restObj.password;
   restObj.phone = decryptText({
     ciphertext: restObj.phone,
-    secretKey:process.env.SECRETE_KEY,
+    secretKey: process.env.SECRETE_KEY,
   });
   return {
     id,

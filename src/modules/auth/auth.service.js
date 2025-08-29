@@ -4,8 +4,15 @@ import { compareHash, hash } from "../../utils/security/hash.security.js";
 import { encryptText } from "../../utils/security/encrypt.security.js";
 import successHandler from "../../utils/handlers/success.handler.js";
 import DBService from "../../db/service.db.js";
-import { generateToken } from "../../utils/security/token.security.js";
+import {
+  generateToken,
+  getTekenKeys,
+} from "../../utils/security/token.security.js";
 import asyncHandler from "../../utils/handlers/async.handler.js";
+import {
+  bearerKeyEnum,
+  roleEnum,
+} from "../../utils/constants/enum.constants.js";
 
 export const signup = asyncHandler(async (req, res, next) => {
   let { fullName, email, password, phone, gender } = req.body || {};
@@ -56,13 +63,17 @@ export const signin = asyncHandler(async (req, res, next) => {
     throw new CustomError("wrong email or password", 404);
   }
 
+  const signatureLevel =
+    user.role !== roleEnum.user ? bearerKeyEnum.system : bearerKeyEnum.bearer;
+  const tokenKeys = getTekenKeys({ signatureLevel });
+
   const accessToken = generateToken({
     payload: { id: user.id },
-    secretKey: process.env.ACCESS_TOKEN_KEY,
+    secretKey: tokenKeys.accessTokenKey,
   });
   const refreshToken = generateToken({
     payload: { id: user.id },
-    secretKey: process.env.REFRESH_TOKEN_KEY,
+    secretKey: tokenKeys.refreshTokenKey,
     options: {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     },
