@@ -1,6 +1,6 @@
 function asyncHandler(fn) {
-  return (req, res, next) => {
-    fn(req, res, next).catch((error) => {
+  return async (req, res, next) => {
+    await fn(req, res, next).catch((error) => {
       next(error);
     });
   };

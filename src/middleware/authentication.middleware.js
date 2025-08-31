@@ -9,6 +9,8 @@ const authenticationMiddleware = ({
   tokenType = tokenTypeEnum.access,
 } = {}) => {
   return asyncHandler(async (req, res, next) => {
+    console.log("executing ------------");
+
     const { authorization } = req.headers;
 
     const [bearerKey, token] = authorization?.split(" ") || [];
@@ -38,6 +40,8 @@ const authenticationMiddleware = ({
     }
 
     req.user = user;
+    console.log(req.user);
+    
     next();
   });
 };
