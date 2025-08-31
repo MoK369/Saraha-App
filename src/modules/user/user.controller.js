@@ -16,7 +16,11 @@ userRouter.get(
 );
 userRouter.get(
   "/refresh-token",
-  authenticationMiddleware({ tokenType: tokenTypeEnum.refresh }),
+  //authenticationMiddleware({ tokenType: tokenTypeEnum.refresh }),
+  combinedAuth({
+    tokenType: tokenTypeEnum.refresh,
+    accessRole: endpointAuth.refreshToken,
+  }),
   userService.getNewLoginCredentials
 );
 

@@ -1,3 +1,5 @@
+import { OAuth2Client } from "google-auth-library";
+
 export async function verifyGoogleAccount({ idToken }) {
   const client = new OAuth2Client();
   const ticket = await client.verifyIdToken({

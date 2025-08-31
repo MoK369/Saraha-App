@@ -39,7 +39,11 @@ export const signup = asyncHandler(async (req, res, next) => {
   });
 
   emailEvent.emit("confirmEmail", { to: email, otp });
-  return successHandler({ res, statusCode: 201, message: "user created!" });
+  return successHandler({
+    res,
+    statusCode: 201,
+    message: "user created! Verification OTP will be sent",
+  });
 });
 
 export const signin = asyncHandler(async (req, res, next) => {
