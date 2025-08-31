@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema(
     },
     picture: String,
     confirmEmail: Date,
+    confirmEmailOtp: String,
   },
   {
     timestamps: true,

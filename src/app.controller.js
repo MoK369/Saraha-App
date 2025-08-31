@@ -6,6 +6,7 @@ import errorHandler from "./utils/handlers/error.handler.js";
 import authController from "./modules/auth/auth.controller.js";
 import userController from "./modules/user/user.controller.js";
 import cors from "cors";
+import sendEmail from "./utils/email/send.email.js";
 
 async function bootstrap() {
   const filePath = path.resolve("./src/config/.env.dev");
