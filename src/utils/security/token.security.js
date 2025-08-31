@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { bearerKeyEnum } from "../constants/enum.constants.js";
+import { bearerKeyEnum, roleEnum } from "../constants/enum.constants.js";
 
 export const generateToken = ({
   payload,
@@ -30,4 +30,24 @@ export const getTekenKeys = ({ signatureLevel } = {}) => {
       break;
   }
   return tokenKeys;
+};
+
+export const generateLoginCredentials = ({ user } = {}) => {
+  const signatureLevel =
+    user.role !== roleEnum.user ? bearerKeyEnum.system : bearerKeyEnum.bearer;
+
+  const tokenKeys = getTekenKeys({ signatureLevel });
+
+  const accessToken = generateToken({
+    payload: { id: user.id },
+    secretKey: tokenKeys.accessTokenKey,
+  });
+
+  const refreshToken = generateToken({
+    payload: { id: user.id },
+    secretKey: tokenKeys.refreshTokenKey,
+    options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },
+  });
+
+  return { accessToken, refreshToken };
 };

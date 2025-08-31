@@ -12,3 +12,13 @@ export const bearerKeyEnum = {
   system: "System",
   bearer: "Bearer",
 };
+
+export const tokenTypeEnum = {
+  access: "access",
+  refresh: "refresh",
+};
+
+export const providerEnum = {
+  system: "system",
+  google: "google",
+};

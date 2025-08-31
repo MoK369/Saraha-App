@@ -5,6 +5,7 @@ import express from "express";
 import errorHandler from "./utils/handlers/error.handler.js";
 import authController from "./modules/auth/auth.controller.js";
 import userController from "./modules/user/user.controller.js";
+import cors from "cors";
 
 async function bootstrap() {
   const filePath = path.resolve("./src/config/.env.dev");
@@ -12,6 +13,9 @@ async function bootstrap() {
 
   const app = express();
   const port = process.env.PORT;
+
+  // cors origin
+  app.use(cors());
 
   const result = await checkDbConnection();
   if (!result) {

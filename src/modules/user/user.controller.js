@@ -1,6 +1,7 @@
 import { Router } from "express";
 import * as userService from "./user.service.js";
 import authenticationMiddleware from "../../middleware/authentication.middleware.js";
+import { tokenTypeEnum } from "../../utils/constants/enum.constants.js";
 
 const userRouter = Router();
 userRouter.get(
@@ -9,9 +10,9 @@ userRouter.get(
   userService.getUserProfile
 );
 userRouter.get(
-  "/refresh-access-token",
-  authenticationMiddleware({ authOnRefreshToken: true }),
-  userService.refreshAccessToken
+  "/refresh-token",
+  authenticationMiddleware({ tokenType: tokenTypeEnum.refresh }),
+  userService.getNewLoginCredentials
 );
 
 export default userRouter;
