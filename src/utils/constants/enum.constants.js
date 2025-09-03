@@ -1,3 +1,8 @@
+export const moodEnum = {
+  development: "Development",
+  production: "Production",
+};
+
 export const genderEnum = {
   male: "male",
   female: "female",
