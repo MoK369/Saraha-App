@@ -42,7 +42,7 @@ const authenticationMiddleware = ({
     req.user = user;
     console.log(req.user);
     
-    next();
+    return next();
   });
 };
 

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import {
   genderEnum,
   providerEnum,
@@ -55,6 +55,16 @@ const userSchema = new mongoose.Schema(
     picture: String,
     confirmEmail: Date,
     confirmEmailOtp: String,
+    deletedAt: Date,
+    deletedBy: {
+      type: Types.ObjectId,
+      ref: "User",
+    },
+    restoredAt: Date,
+    restoredBy: {
+      type: Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,

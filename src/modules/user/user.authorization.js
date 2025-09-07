@@ -1,8 +1,9 @@
 import { roleEnum } from "../../utils/constants/enum.constants.js";
+import { deleteAccount } from "./user.service.js";
 
 const endpointAuth = {
-  profile: Object.values(roleEnum),
-  refreshToken: Object.values(roleEnum),
+  restoreAccount: roleEnum.admin,
+  deleteAccount: roleEnum.admin
 };
 
 export default endpointAuth;

@@ -18,7 +18,7 @@ const validationMiddleware = ({ validationSchema }) => {
     console.log(errorObject);
 
     if (Object.values(errorObject).length) {
-      return next(errorObject);
+      return next({name:"ValidationError",errorObject});
     }
 
     next();
