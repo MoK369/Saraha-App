@@ -21,7 +21,7 @@ export const signup = asyncHandler(async (req, res, next) => {
   }
 
   if (password) {
-    password = await hash({ plainText: password, saltRound: 10 });
+    password = await hash({ plainText: password });
   }
   if (phone) {
     phone = encryptText({
@@ -31,7 +31,7 @@ export const signup = asyncHandler(async (req, res, next) => {
   }
 
   const otp = customAlphabet("0123456789", 6)();
-  const confirmEmailOtp = await hash({ plainText: otp, saltRound: 10 });
+  const confirmEmailOtp = await hash({ plainText: otp });
 
   await DBService.create({
     model: UserModel,

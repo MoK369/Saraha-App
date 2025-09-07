@@ -55,6 +55,16 @@ const deleteAccount = {
   }),
 };
 
+const updatePassword = {
+  body: Joi.object().keys({
+    oldPassword: generalFields.password.required(),
+    password: generalFields.password.not(Joi.ref("oldPassword")).required().messages({
+      "any.invalid":"password can not be the same as oldPassword"
+    }),
+    confirmPassword: generalFields.confirmPassword.required(),
+  }).required(),
+};
+
 const userValidators = {
   profile,
   refeshToken,
@@ -62,7 +72,8 @@ const userValidators = {
   updateBasicProfile,
   freezeAccount,
   restoreAccount,
-  deleteAccount
+  deleteAccount,
+  updatePassword
 };
 
 export default userValidators;

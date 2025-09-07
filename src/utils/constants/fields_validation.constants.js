@@ -15,13 +15,15 @@ const generalFields = {
       "string.pattern.base":
         "name must be one word, starts with a capital letter, with maximum 15 characters",
     }),
-  email: Joi.string().pattern(
-    new RegExp(
-      /^[a-zA-Z]{1,}\d{0,}[a-zA-Z0-9]{1,}[@](gmail|outlook)(\.com|\.edu|\.net){1,3}$/
+  email: Joi.string()
+    .pattern(
+      new RegExp(
+        /^[a-zA-Z]{1,}\d{0,}[a-zA-Z0-9]{1,}[@](gmail|outlook)(\.com|\.edu|\.net){1,3}$/
+      )
     )
-  ).messages({
-    "string.pattern.base":"invalid email format"
-  }),
+    .messages({
+      "string.pattern.base": "invalid email format",
+    }),
   password: Joi.string()
     .pattern(new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/))
 
@@ -29,8 +31,8 @@ const generalFields = {
       "string.pattern.base":
         "password must be 8 charactors long, includes at least one capital letter, small letter, number and special character",
     }),
-  gender: Joi.string().valid(...Object.values(genderEnum)),
   confirmPassword: Joi.string().valid(Joi.ref("password")),
+  gender: Joi.string().valid(...Object.values(genderEnum)),
   phone: Joi.string().pattern(new RegExp(/^(002|\+2)?01[0125][0-9]{8}$/)),
   otp: Joi.string()
     .pattern(new RegExp(/^\d{6,6}$/))

@@ -6,6 +6,7 @@ import { generateLoginCredentials } from "../../utils/security/token.security.js
 import CustomError from "../../utils/custom/error_class.custom.js";
 import { encryptText } from "../../utils/security/encrypt.security.js";
 import { roleEnum } from "../../utils/constants/enum.constants.js";
+import { compareHash, hash } from "../../utils/security/hash.security.js";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: req.user });
@@ -126,7 +127,6 @@ export const restoreAccount = asyncHandler(async (req, res, next) => {
 export const deleteAccount = asyncHandler(async (req, res, next) => {
   const { userId } = req.params || {};
 
-
   const result = await DBService.deleteOne({
     model: UserModel,
     filter: {
@@ -140,4 +140,33 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
     throw new CustomError("invalid account", 404);
   }
   return successHandler({ res, message: "deleted successfully!" });
+});
+
+export const updatePassword = asyncHandler(async (req, res, next) => {
+  const { oldPassword, password } = req.body;
+
+  if (!compareHash({ text: oldPassword, cipherText: req.user.password })) {
+    throw new CustomError("invalid old password", 400);
+  }
+
+  if (req.user.oldPasswords?.length) {
+    for (const oldPassword of req.user.oldPasswords) {
+      if (compareHash({ text: oldPassword, cipherText: password })) {
+        throw new CustomError("this password was used before", 400);
+      }
+    }
+  }
+
+  await DBService.updateOne({
+    model: UserModel,
+    filter: {
+      _id: req.user.id,
+    },
+    update: {
+      password: await hash({ plainText: password }),
+     $push: { oldPasswords: req.user.password },
+    },
+  });
+
+  return successHandler({ res, message: "password updated successfully!" });
 });

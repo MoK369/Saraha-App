@@ -6,7 +6,6 @@ import validationMiddleware from "../../middleware/validation.middleware.js";
 import userValidators from "./user.validation.js";
 import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
-import authorizationMiddleware from "../../middleware/authorization.middleware.js";
 
 const userRouter = Router();
 userRouter.get(
@@ -42,6 +41,12 @@ userRouter.delete(
   userService.deleteAccount
 );
 
+userRouter.patch(
+  "/update-password",
+  authenticationMiddleware(),
+  validationMiddleware({ validationSchema: userValidators.updatePassword }),
+  userService.updatePassword
+);
 
 userRouter.patch(
   "/:userId/restore-account",

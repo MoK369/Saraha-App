@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
         return this.provider === providerEnum.system;
       },
     },
+    oldPasswords: [String],
     phone: {
       type: String,
       required: function () {

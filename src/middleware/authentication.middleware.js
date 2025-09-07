@@ -33,7 +33,13 @@ const authenticationMiddleware = ({
       throw new CustomError("Invalid token", 401);
     }
 
-    const user = await DBService.findById({ model: UserModel, id: payload.id });
+    const user = await DBService.findOne({
+      model: UserModel,
+      filter: {
+        _id: payload.id,
+        deletedAt: { $exists: false },
+      },
+    });
 
     if (!user) {
       throw new CustomError("user not found", 404);
@@ -41,7 +47,7 @@ const authenticationMiddleware = ({
 
     req.user = user;
     console.log(req.user);
-    
+
     return next();
   });
 };
