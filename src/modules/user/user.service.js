@@ -145,16 +145,37 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
 export const updatePassword = asyncHandler(async (req, res, next) => {
   const { oldPassword, password } = req.body;
 
-  if (!compareHash({ text: oldPassword, cipherText: req.user.password })) {
+  if (
+    !(await compareHash({ text: oldPassword, cipherText: req.user.password }))
+  ) {
     throw new CustomError("invalid old password", 400);
   }
 
   if (req.user.oldPasswords?.length) {
-    for (const oldPassword of req.user.oldPasswords) {
-      if (compareHash({ text: oldPassword, cipherText: password })) {
+    console.log("checking oldPasswords");
+
+    for (const elementPassword of req.user.oldPasswords) {
+      if (
+        await compareHash({
+          text: password,
+          cipherText: elementPassword,
+        })
+      ) {
         throw new CustomError("this password was used before", 400);
       }
     }
+  }
+
+  if (req.user.oldPasswords?.length > 5) {
+    await DBService.updateOne({
+      model: UserModel,
+      filter: {
+        _id: req.user.id,
+      },
+      update: {
+        $pop: { oldPasswords: -1 },
+      },
+    });
   }
 
   await DBService.updateOne({
@@ -164,7 +185,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     },
     update: {
       password: await hash({ plainText: password }),
-     $push: { oldPasswords: req.user.password },
+      $push: { oldPasswords: req.user.password },
     },
   });
 
