@@ -30,5 +30,22 @@ authRouter.post(
   validationMiddleware({ validationSchema: AuthValidators.signWithGmail }),
   authService.signinWithGmail
 );
+authRouter.post(
+  "/forgot-password",
+  validationMiddleware({ validationSchema: AuthValidators.forgotPassword }),
+  authService.sendForgotPassword
+);
+
+authRouter.post(
+  "/verify-forgot-password",
+  validationMiddleware({ validationSchema: AuthValidators.veifyForgotPassword }),
+  authService.verifyForgotPassword
+);
+
+authRouter.post(
+  "/reset-forgot-password",
+  validationMiddleware({ validationSchema: AuthValidators.resetForgotPassword }),
+  authService.restForgotPassword
+);
 
 export default authRouter;

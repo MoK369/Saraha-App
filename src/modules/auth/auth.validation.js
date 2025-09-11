@@ -38,6 +38,39 @@ const signWithGmail = {
   }),
 };
 
-const AuthValidators = { signin, signup, confirmEmail, signWithGmail };
+const forgotPassword = {
+  body: Joi.object()
+    .keys({
+      email: generalFields.email.required(),
+    })
+    .required(),
+};
+
+const veifyForgotPassword = {
+  body: forgotPassword.body
+    .append({
+      otp: generalFields.otp.required(),
+    })
+    .required(),
+};
+
+const resetForgotPassword = {
+  body: forgotPassword.body
+    .append({
+      password: generalFields.password.required(),
+      confirmPassword: generalFields.confirmPassword.required(),
+    })
+    .required(),
+};
+
+const AuthValidators = {
+  signin,
+  signup,
+  confirmEmail,
+  signWithGmail,
+  forgotPassword,
+  veifyForgotPassword,
+  resetForgotPassword,
+};
 
 export default AuthValidators;

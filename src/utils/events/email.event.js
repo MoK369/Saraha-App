@@ -14,4 +14,14 @@ emailEvent.on("confirmEmail", async (data) => {
   });
 });
 
+emailEvent.on("forgotPassword", async (data) => {
+  await sendEmail({
+    to: data.to,
+    subject: data.subject || "Forgot Password",
+    html: verifyEmailTemplate({ otp: data.otp, title: data.title }),
+  }).catch((error) => {
+    console.error(`Failed to send email to ${data.to}`);
+  });
+});
+
 export default emailEvent;

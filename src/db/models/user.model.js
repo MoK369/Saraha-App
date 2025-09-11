@@ -66,6 +66,10 @@ const userSchema = new mongoose.Schema(
       type: Types.ObjectId,
       ref: "User",
     },
+    forgotPasswordOtp: String,
+    forgotPasswordOtpCreatedAt: Date,
+    forgotPasswordOtpVerifiedAt: Date,
+    forgotPasswordOtpCounts: Number,
   },
   {
     timestamps: true,

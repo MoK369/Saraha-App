@@ -197,3 +197,124 @@ export const signinWithGmail = asyncHandler(async (req, res, next) => {
     },
   });
 });
+
+export const sendForgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await DBService.findOne({
+    model: UserModel,
+    filter: {
+      email,
+      provider: providerEnum.system,
+      confirmEmail: { $exists: true },
+      deletetAt: { $exists: false },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError("invalid user account", 404);
+  }
+  const otp = customAlphabet("0123456789", 6)();
+  if (user.forgotPasswordOtpCreatedAt) {
+    if (
+      user.forgotPasswordOtpCounts == 5 &&
+      Date.now() < user.forgotPasswordOtpCreatedAt.getTime() + 5 * 60 * 1000
+    ) {
+      throw new CustomError("too many requests, please try after a while", 429);
+    }
+
+    Date.now() < user.forgotPasswordOtpCreatedAt.getTime() + 3 * 60 * 1000
+      ? (user.forgotPasswordOtpCounts += 1)
+      : (user.forgotPasswordOtpCounts = 0);
+  }
+
+  user.forgotPasswordOtp = await hash({ plainText: otp });
+  user.forgotPasswordOtpCreatedAt = Date.now();
+  user.forgotPasswordOtpVerifiedAt = undefined;
+  await user.save();
+
+  emailEvent.emit("forgotPassword", {
+    to: email,
+    otp,
+  });
+  return successHandler({ res, message: "OTP has been sent to this email" });
+});
+
+export const verifyForgotPassword = asyncHandler(async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  const user = await DBService.findOne({
+    model: UserModel,
+    filter: {
+      email,
+      provider: providerEnum.system,
+      confirmEmail: { $exists: true },
+      deletetAt: { $exists: false },
+      forgotPasswordOtp: { $exists: true },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError("invalid user account", 404);
+  }
+
+  if (
+    Date.now() >= user.forgotPasswordOtpCreatedAt.getTime() + 10 * 60 * 1000 ||
+    !(await compareHash({ text: otp, cipherText: user.forgotPasswordOtp }))
+  ) {
+    throw new CustomError("invalid otp or otp has expired");
+  }
+
+  await DBService.updateOne({
+    model: UserModel,
+    filter: { email },
+    update: {
+      forgotPasswordOtpVerifiedAt: Date.now(),
+      $unset: {
+        forgotPasswordOtp: 1,
+      },
+    },
+  });
+
+  return successHandler({ res, message: "OTP Verified" });
+});
+
+export const restForgotPassword = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const user = await DBService.findOne({
+    model: UserModel,
+    filter: {
+      email,
+      provider: providerEnum.system,
+      confirmEmail: { $exists: true },
+      deletetAt: { $exists: false },
+      forgotPasswordOtp: { $exists: false },
+      forgotPasswordOtpVerifiedAt: { $exists: true },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError("invalid user account", 404);
+  }
+
+  if (
+    Date.now() >=
+    user.forgotPasswordOtpVerifiedAt.getTime() + 10 * 60 * 1000
+  ) {
+    throw new CustomError("otp verification has expired");
+  }
+
+  await DBService.updateOne({
+    model: UserModel,
+    filter: { email },
+    update: {
+      password: await hash({ plainText: password }),
+      $unset: {
+        forgotPasswordOtpVerifiedAt: 1,
+      },
+    },
+  });
+
+  return successHandler({ res, message: "Passowrd Reset Successfully!" });
+});
