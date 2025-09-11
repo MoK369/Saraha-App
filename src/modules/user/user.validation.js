@@ -1,6 +1,5 @@
 import Joi from "joi";
 import generalFields from "../../utils/constants/fields_validation.constants.js";
-import { genderEnum } from "../../utils/constants/enum.constants.js";
 
 const profile = {
   headers: Joi.object()
@@ -56,13 +55,26 @@ const deleteAccount = {
 };
 
 const updatePassword = {
-  body: Joi.object().keys({
-    oldPassword: generalFields.password.required(),
-    password: generalFields.password.not(Joi.ref("oldPassword")).required().messages({
-      "any.invalid":"password can not be the same as oldPassword"
-    }),
-    confirmPassword: generalFields.confirmPassword.required(),
-  }).required(),
+  body: Joi.object()
+    .keys({
+      oldPassword: generalFields.password.required(),
+      password: generalFields.password
+        .not(Joi.ref("oldPassword"))
+        .required()
+        .messages({
+          "any.invalid": "password can not be the same as oldPassword",
+        }),
+      confirmPassword: generalFields.confirmPassword.required(),
+    })
+    .required(),
+};
+
+const logout = {
+  headers: Joi.object()
+    .keys({
+      authorization: generalFields.authorization.required(),
+    })
+    .unknown(true),
 };
 
 const userValidators = {
@@ -73,7 +85,8 @@ const userValidators = {
   freezeAccount,
   restoreAccount,
   deleteAccount,
-  updatePassword
+  updatePassword,
+  logout
 };
 
 export default userValidators;

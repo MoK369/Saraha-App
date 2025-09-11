@@ -94,6 +94,9 @@ userSchema.methods.toJSON = function () {
   delete restObj.firstName;
   delete restObj.lastName;
   delete restObj.password;
+  delete restObj.oldPasswords;
+  delete restObj.forgotPasswordOtpCreatedAt;
+  delete restObj.forgotPasswordOtpCounts;
   restObj.phone = decryptText({
     ciphertext: restObj.phone,
     secretKey: process.env.SECRETE_KEY,

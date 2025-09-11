@@ -1,3 +1,4 @@
+import TokenModel from "../db/models/token.model.js";
 import UserModel from "../db/models/user.model.js";
 import DBService from "../db/service.db.js";
 import { tokenTypeEnum } from "../utils/constants/enum.constants.js";
@@ -29,8 +30,19 @@ const authenticationMiddleware = ({
           : tokenKeys.accessTokenKey,
     });
 
-    if (!payload?.id) {
+    if (!payload?.id || !payload?.jti) {
       throw new CustomError("Invalid token", 401);
+    }
+
+    if (
+      await DBService.findOne({
+        model: TokenModel,
+        filter: {
+          jti: payload.jti,
+        },
+      })
+    ) {
+      throw new CustomError("invalid login credentials", 401);
     }
 
     const user = await DBService.findOne({
@@ -46,6 +58,7 @@ const authenticationMiddleware = ({
     }
 
     req.user = user;
+    req.payload = payload;
     console.log(req.user);
 
     return next();

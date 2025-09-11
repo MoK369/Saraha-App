@@ -21,6 +21,12 @@ userRouter.get(
   userService.getNewLoginCredentials
 );
 
+userRouter.get(
+  "/:userId",
+  validationMiddleware({ validationSchema: userValidators.shareUserProfile }),
+  userService.shareUserProfile
+);
+
 userRouter.patch(
   "/update-basic-profile",
   authenticationMiddleware(),
@@ -36,7 +42,7 @@ userRouter.delete(
 );
 userRouter.delete(
   "/:userId",
-  combinedAuth({accessRole: endpointAuth.deleteAccount}),
+  combinedAuth({ accessRole: endpointAuth.deleteAccount }),
   validationMiddleware({ validationSchema: userValidators.deleteAccount }),
   userService.deleteAccount
 );
@@ -50,15 +56,16 @@ userRouter.patch(
 
 userRouter.patch(
   "/:userId/restore-account",
-  combinedAuth({accessRole: endpointAuth.restoreAccount }),
+  combinedAuth({ accessRole: endpointAuth.restoreAccount }),
   validationMiddleware({ validationSchema: userValidators.restoreAccount }),
   userService.restoreAccount
 );
 
-userRouter.get(
-  "/:userId",
-  validationMiddleware({ validationSchema: userValidators.shareUserProfile }),
-  userService.shareUserProfile
+userRouter.post(
+  "/logout",
+  authenticationMiddleware(),
+  validationMiddleware({ validationSchema: userValidators.logout }),
+  userService.logout
 );
 
 export default userRouter;

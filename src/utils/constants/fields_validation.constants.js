@@ -48,7 +48,7 @@ const generalFields = {
   authorization: Joi.string()
     .pattern(
       new RegExp(
-        /^(Beared|System)\s[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/
+        /^(Bearer|System)\s[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/
       )
     )
     .messages({

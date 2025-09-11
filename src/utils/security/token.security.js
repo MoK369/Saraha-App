@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { bearerKeyEnum, roleEnum } from "../constants/enum.constants.js";
+import { nanoid } from "nanoid";
 
 export const generateToken = ({
   payload,
@@ -37,16 +38,20 @@ export const generateLoginCredentials = ({ user } = {}) => {
     user.role !== roleEnum.user ? bearerKeyEnum.system : bearerKeyEnum.bearer;
 
   const tokenKeys = getTekenKeys({ signatureLevel });
-
+  const jwtid = nanoid();
   const accessToken = generateToken({
     payload: { id: user.id },
     secretKey: tokenKeys.accessTokenKey,
+    options: {
+      jwtid,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+    },
   });
 
   const refreshToken = generateToken({
     payload: { id: user.id },
     secretKey: tokenKeys.refreshTokenKey,
-    options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },
+    options: { jwtid, expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },
   });
 
   return { accessToken, refreshToken };

@@ -7,6 +7,7 @@ import CustomError from "../../utils/custom/error_class.custom.js";
 import { encryptText } from "../../utils/security/encrypt.security.js";
 import { roleEnum } from "../../utils/constants/enum.constants.js";
 import { compareHash, hash } from "../../utils/security/hash.security.js";
+import TokenModel from "../../db/models/token.model.js";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: req.user });
@@ -190,4 +191,33 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
   });
 
   return successHandler({ res, message: "password updated successfully!" });
+});
+
+export const logout = asyncHandler(async (req, res, next) => {
+  console.log(req.payload);
+  /*
+  {
+  id: '68c3062977f38e8137f81537',
+  iat: 1757631142,
+  exp: 1757632942,
+  jti: 'eombPmxSvO1UtebBDhRUi'
+ }
+  */
+  await DBService.create({
+    model: TokenModel,
+    docs: [
+      {
+        jti: req.payload.jti,
+        expiresIn:
+          req.payload.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+        userId: req.payload.id,
+      },
+    ],
+  });
+
+  return successHandler({
+    res,
+    statusCode: 201,
+    message: "logout successfully!",
+  });
 });
