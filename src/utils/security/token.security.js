@@ -6,7 +6,7 @@ export const generateToken = ({
   payload,
   secretKey,
   options = {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+    expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
   },
 }) => {
   return jwt.sign(payload, secretKey, options);
@@ -44,14 +44,14 @@ export const generateLoginCredentials = ({ user } = {}) => {
     secretKey: tokenKeys.accessTokenKey,
     options: {
       jwtid,
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+      expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
     },
   });
 
   const refreshToken = generateToken({
     payload: { id: user.id },
     secretKey: tokenKeys.refreshTokenKey,
-    options: { jwtid, expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },
+    options: { jwtid, expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN) },
   });
 
   return { accessToken, refreshToken };

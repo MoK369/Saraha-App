@@ -31,8 +31,18 @@ export const shareUserProfile = asyncHandler(async (req, res, next) => {
 });
 
 export const getNewLoginCredentials = asyncHandler(async (req, res, next) => {
-  const credentials = generateLoginCredentials({ user: req.user });
+  await DBService.create({
+    model: TokenModel,
+    docs: [
+      {
+        jti: req.payload.jti,
+        expiresIn: req.payload.exp,
+        userId: req.payload.id,
+      },
+    ],
+  });
 
+  const credentials = generateLoginCredentials({ user: req.user });
   return successHandler({
     res,
     body: credentials,
