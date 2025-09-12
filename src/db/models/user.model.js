@@ -70,6 +70,7 @@ const userSchema = new mongoose.Schema(
     forgotPasswordOtpCreatedAt: Date,
     forgotPasswordOtpVerifiedAt: Date,
     forgotPasswordOtpCounts: Number,
+    changeCredentialsTime: Date
   },
   {
     timestamps: true,

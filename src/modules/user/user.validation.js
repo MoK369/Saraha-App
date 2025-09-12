@@ -1,5 +1,6 @@
 import Joi from "joi";
 import generalFields from "../../utils/constants/fields_validation.constants.js";
+import { logoutEnum } from "../../utils/constants/enum.constants.js";
 
 const profile = {
   headers: Joi.object()
@@ -54,9 +55,22 @@ const deleteAccount = {
   }),
 };
 
-const updatePassword = {
-  body: Joi.object()
+const logout = {
+  headers: Joi.object()
     .keys({
+      authorization: generalFields.authorization.required(),
+    })
+    .unknown(true),
+  body: Joi.object().keys({
+    flag: Joi.string()
+      .valid(...Object.values(logoutEnum))
+      .default(logoutEnum.stayLoggedIn),
+  }),
+};
+
+const updatePassword = {
+  body: logout.body
+    .append({
       oldPassword: generalFields.password.required(),
       password: generalFields.password
         .not(Joi.ref("oldPassword"))
@@ -69,14 +83,6 @@ const updatePassword = {
     .required(),
 };
 
-const logout = {
-  headers: Joi.object()
-    .keys({
-      authorization: generalFields.authorization.required(),
-    })
-    .unknown(true),
-};
-
 const userValidators = {
   profile,
   refeshToken,
@@ -86,7 +92,7 @@ const userValidators = {
   restoreAccount,
   deleteAccount,
   updatePassword,
-  logout
+  logout,
 };
 
 export default userValidators;

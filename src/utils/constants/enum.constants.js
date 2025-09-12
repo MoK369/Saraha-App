@@ -27,3 +27,9 @@ export const providerEnum = {
   system: "system",
   google: "google",
 };
+
+export const logoutEnum = {
+  logoutFromAll: "logoutFromAll",
+  logout: "logout",
+  stayLoggedIn: "stayLoggedIn",
+};

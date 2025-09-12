@@ -55,7 +55,11 @@ export const signin = asyncHandler(async (req, res, next) => {
 
   const user = await DBService.findOne({
     model: UserModel,
-    filter: { email, provider: providerEnum.system },
+    filter: {
+      email,
+      provider: providerEnum.system,
+      deletedAt: { $exists: false },
+    },
   });
   if (!user) {
     throw new CustomError("wrong email or password", 404);
@@ -310,6 +314,7 @@ export const restForgotPassword = asyncHandler(async (req, res, next) => {
     filter: { email },
     update: {
       password: await hash({ plainText: password }),
+      changeCredentialsTime: Date.now(),
       $unset: {
         forgotPasswordOtpVerifiedAt: 1,
       },

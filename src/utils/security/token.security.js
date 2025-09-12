@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { bearerKeyEnum, roleEnum } from "../constants/enum.constants.js";
 import { nanoid } from "nanoid";
+import TokenModel from "../../db/models/token.model.js";
 
 export const generateToken = ({
   payload,
@@ -55,4 +56,18 @@ export const generateLoginCredentials = ({ user } = {}) => {
   });
 
   return { accessToken, refreshToken };
+};
+
+export const revokeToken = async ({ payload }) => {
+  await DBService.create({
+    model: TokenModel,
+    docs: [
+      {
+        jti: payload.jti,
+        expiresIn: payload.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+        userId: payload.id,
+      },
+    ],
+  });
+  return true;
 };

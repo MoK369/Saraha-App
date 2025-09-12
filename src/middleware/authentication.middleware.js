@@ -57,6 +57,10 @@ const authenticationMiddleware = ({
       throw new CustomError("user not found", 404);
     }
 
+    if (user.changeCredentialsTime?.getTime() > payload.iat * 1000) {
+      throw new CustomError("invalid login credentials", 401);
+    }
+
     req.user = user;
     req.payload = payload;
     console.log(req.user);

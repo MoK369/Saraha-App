@@ -2,10 +2,13 @@ import UserModel from "../../db/models/user.model.js";
 import DBService from "../../db/service.db.js";
 import asyncHandler from "../../utils/handlers/async.handler.js";
 import successHandler from "../../utils/handlers/success.handler.js";
-import { generateLoginCredentials } from "../../utils/security/token.security.js";
+import {
+  generateLoginCredentials,
+  revokeToken,
+} from "../../utils/security/token.security.js";
 import CustomError from "../../utils/custom/error_class.custom.js";
 import { encryptText } from "../../utils/security/encrypt.security.js";
-import { roleEnum } from "../../utils/constants/enum.constants.js";
+import { logoutEnum, roleEnum } from "../../utils/constants/enum.constants.js";
 import { compareHash, hash } from "../../utils/security/hash.security.js";
 import TokenModel from "../../db/models/token.model.js";
 
@@ -94,6 +97,7 @@ export const freezeAccount = asyncHandler(async (req, res, next) => {
     update: {
       deletedAt: Date.now(),
       deletedBy: req.user.id,
+      changeCredentialsTime: Date.now(),
       $unset: {
         restoredAt: 1,
         restoredBy: 1,
@@ -154,7 +158,7 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
 });
 
 export const updatePassword = asyncHandler(async (req, res, next) => {
-  const { oldPassword, password } = req.body;
+  const { oldPassword, password, flag } = req.body;
 
   if (
     !(await compareHash({ text: oldPassword, cipherText: req.user.password }))
@@ -189,6 +193,19 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     });
   }
 
+  let updateObject = {};
+
+  switch (flag) {
+    case logoutEnum.logoutFromAll:
+      updateObject.changeCredentialsTime = Date.now();
+      break;
+
+    case logoutEnum.logout:
+      await revokeToken({ payload: req.payload });
+    default:
+      break;
+  }
+
   await DBService.updateOne({
     model: UserModel,
     filter: {
@@ -196,6 +213,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     },
     update: {
       password: await hash({ plainText: password }),
+      ...updateObject,
       $push: { oldPasswords: req.user.password },
     },
   });
@@ -205,6 +223,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 
 export const logout = asyncHandler(async (req, res, next) => {
   console.log(req.payload);
+  const { flag } = req.body || {};
   /*
   {
   id: '68c3062977f38e8137f81537',
@@ -213,21 +232,29 @@ export const logout = asyncHandler(async (req, res, next) => {
   jti: 'eombPmxSvO1UtebBDhRUi'
  }
   */
-  await DBService.create({
-    model: TokenModel,
-    docs: [
-      {
-        jti: req.payload.jti,
-        expiresIn:
-          req.payload.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
-        userId: req.payload.id,
-      },
-    ],
-  });
+  let statusCode = 200;
+  switch (flag) {
+    case logoutEnum.logoutFromAll:
+      await DBService.updateOne({
+        model: UserModel,
+        filter: {
+          _id: req.user.id,
+        },
+        update: {
+          changeCredentialsTime: Date.now(),
+        },
+      });
+      break;
+
+    default:
+      await revokeToken({ payload: req.payload });
+      statusCode = 201;
+      break;
+  }
 
   return successHandler({
     res,
-    statusCode: 201,
+    statusCode,
     message: "logout successfully!",
   });
 });
