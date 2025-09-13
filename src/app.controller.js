@@ -26,6 +26,7 @@ async function bootstrap() {
       });
     });
   } else {
+    app.use("/uploads", express.static(path.resolve("./src/uploads")));
     app.use(express.json());
     app.use("/auth", authController);
     app.use("/user", userController);

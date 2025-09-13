@@ -8,6 +8,7 @@ import { decryptText } from "../../utils/security/encrypt.security.js";
 
 const userSchema = new mongoose.Schema(
   {
+
     firstName: {
       type: String,
       required: true,
@@ -70,7 +71,8 @@ const userSchema = new mongoose.Schema(
     forgotPasswordOtpCreatedAt: Date,
     forgotPasswordOtpVerifiedAt: Date,
     forgotPasswordOtpCounts: Number,
-    changeCredentialsTime: Date
+    changeCredentialsTime: Date,
+    profilePicture: String,
   },
   {
     timestamps: true,
@@ -108,6 +110,11 @@ userSchema.methods.toJSON = function () {
     ...restObj,
   };
 };
+
+userSchema.methods.getImageUrl = function (req) {
+  return `${req.protocol}://${req.get("host")}/${this.profilePicture}`;
+};
+
 
 const UserModel = mongoose.model("User", userSchema);
 

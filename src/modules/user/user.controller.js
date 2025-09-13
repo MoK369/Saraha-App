@@ -6,6 +6,7 @@ import validationMiddleware from "../../middleware/validation.middleware.js";
 import userValidators from "./user.validation.js";
 import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
+import localFileUpload from "../../utils/multer/local.multer.js";
 
 const userRouter = Router();
 userRouter.get(
@@ -27,13 +28,6 @@ userRouter.get(
   userService.shareUserProfile
 );
 
-userRouter.patch(
-  "/update-basic-profile",
-  authenticationMiddleware(),
-  validationMiddleware({ validationSchema: userValidators.updateBasicProfile }),
-  userService.updateBasicProfile
-);
-
 userRouter.delete(
   "{/:userId}/freeze-account",
   authenticationMiddleware(),
@@ -48,10 +42,24 @@ userRouter.delete(
 );
 
 userRouter.patch(
+  "/update-basic-profile",
+  authenticationMiddleware(),
+  validationMiddleware({ validationSchema: userValidators.updateBasicProfile }),
+  userService.updateBasicProfile
+);
+
+userRouter.patch(
   "/update-password",
   authenticationMiddleware(),
   validationMiddleware({ validationSchema: userValidators.updatePassword }),
   userService.updatePassword
+);
+
+userRouter.patch(
+  "/profile-image",
+  authenticationMiddleware(),
+  localFileUpload({ customPath: "user" }).single("image"),
+  userService.updateProfileImage
 );
 
 userRouter.patch(

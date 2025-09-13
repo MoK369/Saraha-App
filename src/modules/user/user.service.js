@@ -11,6 +11,8 @@ import { encryptText } from "../../utils/security/encrypt.security.js";
 import { logoutEnum, roleEnum } from "../../utils/constants/enum.constants.js";
 import { compareHash, hash } from "../../utils/security/hash.security.js";
 import TokenModel from "../../db/models/token.model.js";
+import fs from "fs/promises";
+import path from "node:path";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: req.user });
@@ -202,6 +204,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 
     case logoutEnum.logout:
       await revokeToken({ payload: req.payload });
+      break;
     default:
       break;
   }
@@ -257,4 +260,19 @@ export const logout = asyncHandler(async (req, res, next) => {
     statusCode,
     message: "logout successfully!",
   });
+});
+
+export const updateProfileImage = asyncHandler(async (req, res, next) => {
+  if (req.user?.profilePicture) {
+    await fs.unlink(path.resolve("./src/"+req.user.profilePicture));
+  }
+  const user = await DBService.findOneAndUpdate({
+    model: UserModel,
+    filter: { _id: req.user.id },
+    update: {
+      profilePicture: req.file.finalPath,
+    },
+  });
+  user.profilePicture = user.getImageUrl(req);
+  return successHandler({ res, body: user });
 });
