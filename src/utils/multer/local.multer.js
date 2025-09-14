@@ -1,8 +1,9 @@
 import multer from "multer";
 import fs from "fs/promises";
 import path from "node:path";
+import CustomError from "../custom/error_class.custom.js";
 
-const localFileUpload = ({ customPath = "general" } = {}) => {
+const localFileUpload = ({ customPath = "general", validation = [] } = {}) => {
   /* 
     Not to put this === let basePath = `uploads/${customPath}`; === here because:
     Since localFileUpload() is called once during setup, 
@@ -42,7 +43,22 @@ const localFileUpload = ({ customPath = "general" } = {}) => {
     },
   });
 
-  return multer({ dest: "./temp", storage });
+  const fileFilter = function (req, file, callback) {
+    if (validation.includes(file.mimetype)) {
+      return callback(null, true);
+    }
+
+    return callback(new CustomError("Invalid image format"), false);
+  };
+
+  return multer({
+    dest: "./temp",
+    fileFilter,
+    limits: {
+      fileSize: 512000, // in bytes
+    },
+    storage,
+  });
 };
 
 export default localFileUpload;

@@ -7,6 +7,7 @@ import userValidators from "./user.validation.js";
 import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
 import localFileUpload from "../../utils/multer/local.multer.js";
+import fileValidation from "../../utils/constants/files_validation.constants.js";
 
 const userRouter = Router();
 userRouter.get(
@@ -58,7 +59,10 @@ userRouter.patch(
 userRouter.patch(
   "/profile-image",
   authenticationMiddleware(),
-  localFileUpload({ customPath: "user" }).single("image"),
+  localFileUpload({
+    customPath: "user",
+    validation: fileValidation.image,
+  }).single("image"),
   userService.updateProfileImage
 );
 
