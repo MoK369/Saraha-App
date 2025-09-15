@@ -1,5 +1,5 @@
 const fileValidation = {
-  image: ["image/jpeg"],
+  image: ["image/jpeg","image/png"],
   pdf: ["application/pdf"],
 };
 

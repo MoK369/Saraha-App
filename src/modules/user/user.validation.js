@@ -1,6 +1,7 @@
 import Joi from "joi";
 import generalFields from "../../utils/constants/fields_validation.constants.js";
 import { logoutEnum } from "../../utils/constants/enum.constants.js";
+import fileValidation from "../../utils/constants/files_validation.constants.js";
 
 const shareUserProfile = {
   params: Joi.object().keys({
@@ -62,6 +63,33 @@ const updatePassword = {
     .required(),
 };
 
+const profileCoverImages = {
+  files: Joi.array()
+    .items(
+      Joi.object().keys({
+        fieldname: generalFields.fileKeys.fieldname.valid("images"),
+        originalname: generalFields.fileKeys.originalname,
+        encoding: generalFields.fileKeys.encoding,
+        mimetype: generalFields.fileKeys.mimetype.valid(
+          ...Object.values(fileValidation.image)
+        ),
+        basePath: generalFields.fileKeys.basePath,
+        finalPath: generalFields.fileKeys.finalPath,
+        destination: generalFields.fileKeys.destination,
+        filename: generalFields.fileKeys.fieldname,
+        path: generalFields.fileKeys.path,
+        size: generalFields.fileKeys.size,
+      })
+    )
+    .min(1)
+    .max(2)
+    .required()
+    .messages({
+      "any.required":
+        "images field is required with mininum 1 image and maximum 2 images",
+    }),
+};
+
 const userValidators = {
   shareUserProfile,
   updateBasicProfile,
@@ -70,6 +98,7 @@ const userValidators = {
   deleteAccount,
   updatePassword,
   logout,
+  profileCoverImages,
 };
 
 export default userValidators;

@@ -73,6 +73,7 @@ const userSchema = new mongoose.Schema(
     forgotPasswordOtpCounts: Number,
     changeCredentialsTime: Date,
     profilePicture: String,
+    coverImages: [String]
   },
   {
     timestamps: true,
@@ -111,8 +112,8 @@ userSchema.methods.toJSON = function () {
   };
 };
 
-userSchema.methods.getImageUrl = function (req) {
-  return `${req.protocol}://${req.get("host")}/${this.profilePicture}`;
+userSchema.methods.getImageUrl = function (req,imagePath) {
+  return `${req.protocol}://${req.get("host")}/${imagePath}`;
 };
 
 

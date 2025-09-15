@@ -63,6 +63,16 @@ userRouter.patch(
   }).single("image"),
   userService.updateProfileImage
 );
+userRouter.patch(
+  "/profile-cover-images",
+  authenticationMiddleware(),
+  localFileUpload({
+    customPath: "user",
+    validation: fileValidation.image,
+  }).array("images", 2),
+  validationMiddleware({validationSchema: userValidators.profileCoverImages}),
+  userService.updateProfileCoverImages
+);
 
 userRouter.patch(
   "/:userId/restore-account",

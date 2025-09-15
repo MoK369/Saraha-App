@@ -264,7 +264,7 @@ export const logout = asyncHandler(async (req, res, next) => {
 
 export const updateProfileImage = asyncHandler(async (req, res, next) => {
   if (req.user?.profilePicture) {
-    await fs.unlink(path.resolve("./src/"+req.user.profilePicture));
+    await fs.unlink(path.resolve("./src/" + req.user.profilePicture));
   }
   const user = await DBService.findOneAndUpdate({
     model: UserModel,
@@ -273,6 +273,28 @@ export const updateProfileImage = asyncHandler(async (req, res, next) => {
       profilePicture: req.file.finalPath,
     },
   });
-  user.profilePicture = user.getImageUrl(req);
+  user.profilePicture = user.getImageUrl(req, user.profilePicture);
+  return successHandler({ res, body: user });
+});
+export const updateProfileCoverImages = asyncHandler(async (req, res, next) => {
+  console.log({files: req.files});
+
+  if (req.user?.coverImages && req.files) {
+    await Promise.all(
+      req.user.coverImages.map((filePath) =>
+        fs.unlink(path.resolve("./src/" + filePath))
+      )
+    );
+  }
+  const user = await DBService.findOneAndUpdate({
+    model: UserModel,
+    filter: { _id: req.user.id },
+    update: {
+      coverImages: req.files?.map((file) => file.finalPath),
+    },
+  });
+  user.coverImages = user.coverImages?.map((filePath) =>
+    user.getImageUrl(req, filePath)
+  );
   return successHandler({ res, body: user });
 });

@@ -59,5 +59,17 @@ const generalFields = {
     console.log(value);
     return Types.ObjectId.isValid(value) || helper.message("invalid objectId");
   }),
+  fileKeys: {
+    fieldname: Joi.string().required(),
+    originalname: Joi.string().required(),
+    encoding: Joi.string().required(),
+    mimetype: Joi.string().required(),
+    basePath: Joi.string(),
+    finalPath: Joi.string().required(),
+    destination: Joi.string().required(),
+    filename: Joi.string().required(),
+    path: Joi.string().required(),
+    size: Joi.number().positive().required(),
+  },
 };
 export default generalFields;
