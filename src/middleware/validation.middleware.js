@@ -1,6 +1,7 @@
 import asyncHandler from "../utils/handlers/async.handler.js";
 import { moodEnum } from "../utils/constants/enum.constants.js";
 
+
 const validationMiddleware = ({ validationSchema }) => {
   return asyncHandler(async (req, res, next) => {
     const errorObject = {};
@@ -10,15 +11,16 @@ const validationMiddleware = ({ validationSchema }) => {
         abortEarly: false,
       });
       if (validationResult.error) {
-        errorObject[key] = process.env.MOOD == moodEnum.production
-          ? validationResult.error.message
-          : validationResult.error.details;
+        errorObject[key] =
+          process.env.MOOD == moodEnum.production
+            ? validationResult.error.message
+            : validationResult.error.details;
       }
     }
     console.log(errorObject);
 
     if (Object.values(errorObject).length) {
-      return next({name:"ValidationError",errorObject});
+      return next({ name: "ValidationError", errorObject });
     }
 
     next();

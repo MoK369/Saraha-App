@@ -2,22 +2,6 @@ import Joi from "joi";
 import generalFields from "../../utils/constants/fields_validation.constants.js";
 import { logoutEnum } from "../../utils/constants/enum.constants.js";
 
-const profile = {
-  headers: Joi.object()
-    .keys({
-      authorization: generalFields.authorization.required(),
-    })
-    .unknown(true),
-};
-
-const refeshToken = {
-  headers: Joi.object()
-    .keys({
-      authorization: generalFields.authorization.required(),
-    })
-    .unknown(true),
-};
-
 const shareUserProfile = {
   params: Joi.object().keys({
     userId: generalFields.objectId.required(),
@@ -56,11 +40,6 @@ const deleteAccount = {
 };
 
 const logout = {
-  headers: Joi.object()
-    .keys({
-      authorization: generalFields.authorization.required(),
-    })
-    .unknown(true),
   body: Joi.object().keys({
     flag: Joi.string()
       .valid(...Object.values(logoutEnum))
@@ -84,8 +63,6 @@ const updatePassword = {
 };
 
 const userValidators = {
-  profile,
-  refeshToken,
   shareUserProfile,
   updateBasicProfile,
   freezeAccount,

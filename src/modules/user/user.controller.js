@@ -12,13 +12,11 @@ import fileValidation from "../../utils/constants/files_validation.constants.js"
 const userRouter = Router();
 userRouter.get(
   "/profile",
-  validationMiddleware({ validationSchema: userValidators.profile }),
   authenticationMiddleware(),
   userService.getUserProfile
 );
 userRouter.get(
   "/refresh-token",
-  validationMiddleware({ validationSchema: userValidators.refeshToken }),
   authenticationMiddleware({ tokenType: tokenTypeEnum.refresh }),
   userService.getNewLoginCredentials
 );

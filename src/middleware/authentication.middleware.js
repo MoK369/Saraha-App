@@ -1,16 +1,37 @@
+import Joi from "joi";
 import TokenModel from "../db/models/token.model.js";
 import UserModel from "../db/models/user.model.js";
 import DBService from "../db/service.db.js";
-import { tokenTypeEnum } from "../utils/constants/enum.constants.js";
+import { moodEnum, tokenTypeEnum } from "../utils/constants/enum.constants.js";
 import CustomError from "../utils/custom/error_class.custom.js";
 import asyncHandler from "../utils/handlers/async.handler.js";
 import { getTekenKeys, verifyToken } from "../utils/security/token.security.js";
+import generalFields from "../utils/constants/fields_validation.constants.js";
 
 const authenticationMiddleware = ({
   tokenType = tokenTypeEnum.access,
 } = {}) => {
   return asyncHandler(async (req, res, next) => {
     console.log("executing ------------");
+
+    const validationResult = Joi.object()
+      .keys({
+        authorization: generalFields.authorization.required(),
+      })
+      .unknown(true)
+      .validate(req.headers, { abortEarly: false });
+
+    if (validationResult.error) {
+      return process.env.MOOD == moodEnum.production
+        ? next({
+            name: "ValidationError",
+            errorObject: validationResult.error.message,
+          })
+        : next({
+            name: "ValidationError",
+            errorObject: validationResult.error.details,
+          });
+    }
 
     const { authorization } = req.headers;
 
@@ -21,6 +42,7 @@ const authenticationMiddleware = ({
     console.log({ bearerKey, token });
 
     const tokenKeys = getTekenKeys({ signatureLevel: bearerKey });
+    console.log({ tokenKeys });
 
     const payload = verifyToken({
       token,
