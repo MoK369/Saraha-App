@@ -13,6 +13,14 @@ import { compareHash, hash } from "../../utils/security/hash.security.js";
 import TokenModel from "../../db/models/token.model.js";
 import fs from "fs/promises";
 import path from "node:path";
+import {
+  cloudinaryCloud,
+  cloudinaryDeleteFile,
+  cloudinaryDeleteFiles,
+  cloudinaryDeleteFolder,
+  cloudinaryUploadFile,
+  cloudinaryUploadFiles,
+} from "../../utils/multer/cloudinary.js";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: req.user });
@@ -144,18 +152,30 @@ export const restoreAccount = asyncHandler(async (req, res, next) => {
 export const deleteAccount = asyncHandler(async (req, res, next) => {
   const { userId } = req.params || {};
 
-  const result = await DBService.deleteOne({
+  const user = await DBService.findOne({
     model: UserModel,
-    filter: {
-      _id: userId,
-      deletedAt: { $exists: true },
-    },
+    filter: { _id: userId, deletedAt: { $exists: true } },
   });
-  console.log({ result });
 
-  if (!result.deletedCount) {
+  if (!user) {
     throw new CustomError("invalid account", 404);
   }
+
+  await cloudinaryDeleteFolder({ path: `user/${userId}` }).catch((error) => {
+    console.log("error while deleting user files from cloudinary");
+    throw new CustomError(
+      "error deleting user files, please try again later",
+      500
+    );
+  });
+
+  await DBService.deleteOne({
+    model: UserModel,
+    filter: {
+      _id: user.id,
+    },
+  });
+
   return successHandler({ res, message: "deleted successfully!" });
 });
 
@@ -263,39 +283,80 @@ export const logout = asyncHandler(async (req, res, next) => {
 });
 
 export const updateProfileImage = asyncHandler(async (req, res, next) => {
-  if (req.user?.profilePicture) {
-    await fs.unlink(path.resolve("./src/" + req.user.profilePicture));
-  }
+  // if (req.user?.profilePicture) {
+  //   await fs.unlink(path.resolve("./src/" + req.user.profilePicture));
+  // }
+  // const user = await DBService.findOneAndUpdate({
+  //   model: UserModel,
+  //   filter: { _id: req.user.id },
+  //   update: {
+  //     profilePicture: req.file.finalPath,
+  //   },
+  // });
+  // user.profilePicture = user.getImageUrl(req, user.profilePicture);
+  console.log({ file: req.file });
+
+  const { secure_url, public_id } = await cloudinaryUploadFile({
+    file: req.file,
+    path: `user/${req.user.id}`,
+  });
+
   const user = await DBService.findOneAndUpdate({
     model: UserModel,
     filter: { _id: req.user.id },
     update: {
-      profilePicture: req.file.finalPath,
+      profilePicture: { secure_url, public_id },
     },
   });
-  user.profilePicture = user.getImageUrl(req, user.profilePicture);
+  if (req.user?.profilePicture?.public_id) {
+    // delete old image from cloudinary
+    await cloudinaryDeleteFile({
+      public_id: req.user.profilePicture.public_id,
+    });
+  }
   return successHandler({ res, body: user });
 });
 export const updateProfileCoverImages = asyncHandler(async (req, res, next) => {
-  console.log({files: req.files});
+  console.log({ files: req.files });
 
-  if (req.user?.coverImages && req.files) {
-    await Promise.all(
-      req.user.coverImages.map((filePath) =>
-        fs.unlink(path.resolve("./src/" + filePath))
-      )
-    );
-  }
+  // if (req.user?.coverImages && req.files) {
+  //   await Promise.all(
+  //     req.user.coverImages.map((filePath) =>
+  //       fs.unlink(path.resolve("./src/" + filePath))
+  //     )
+  //   );
+  // }
+  // const user = await DBService.findOneAndUpdate({
+  //   model: UserModel,
+  //   filter: { _id: req.user.id },
+  //   update: {
+  //     coverImages: req.files?.map((file) => file.finalPath),
+  //   },
+  // });
+  // user.coverImages = user.coverImages?.map((filePath) =>
+  //   user.getImageUrl(req, filePath)
+  // );
+  // user.profilePicture = user.getImageUrl(req, user.profilePicture);
+
+  const attachments = await cloudinaryUploadFiles({
+    files: req.files,
+    path: `user/${req.user.id}/coverImages`,
+  });
+
   const user = await DBService.findOneAndUpdate({
     model: UserModel,
     filter: { _id: req.user.id },
     update: {
-      coverImages: req.files?.map((file) => file.finalPath),
+      coverImages: attachments,
     },
   });
-  user.coverImages = user.coverImages?.map((filePath) =>
-    user.getImageUrl(req, filePath)
-  );
-  user.profilePicture = user.getImageUrl(req, user.profilePicture);
+
+  if (req.user?.coverImages?.length) {
+    // delete old images from cloudinary
+    await cloudinaryDeleteFiles({
+      public_ids: req.user.coverImages.map((file) => file.public_id),
+    });
+  }
+
   return successHandler({ res, body: user });
 });

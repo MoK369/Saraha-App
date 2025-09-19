@@ -73,7 +73,7 @@ const profileImage = {
         ...Object.values(fileValidation.image)
       ),
       basePath: generalFields.fileKeys.basePath,
-      finalPath: generalFields.fileKeys.finalPath,
+      //finalPath: generalFields.fileKeys.finalPath,
       destination: generalFields.fileKeys.destination,
       filename: generalFields.fileKeys.fieldname,
       path: generalFields.fileKeys.path,
@@ -96,7 +96,7 @@ const profileCoverImages = {
           ...Object.values(fileValidation.image)
         ),
         basePath: generalFields.fileKeys.basePath,
-        finalPath: generalFields.fileKeys.finalPath,
+        //finalPath: generalFields.fileKeys.finalPath,
         destination: generalFields.fileKeys.destination,
         filename: generalFields.fileKeys.fieldname,
         path: generalFields.fileKeys.path,

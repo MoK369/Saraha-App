@@ -8,6 +8,7 @@ import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
 import localFileUpload from "../../utils/multer/local.multer.js";
 import fileValidation from "../../utils/constants/files_validation.constants.js";
+import cloudFileUpload from "../../utils/multer/cloud.multer.js";
 
 const userRouter = Router();
 userRouter.get(
@@ -57,8 +58,7 @@ userRouter.patch(
 userRouter.patch(
   "/profile-image",
   authenticationMiddleware(),
-  localFileUpload({
-    customPath: "user",
+  cloudFileUpload({
     validation: fileValidation.image,
   }).single("image"),
   validationMiddleware({validationSchema: userValidators.profileImage}),
@@ -67,8 +67,7 @@ userRouter.patch(
 userRouter.patch(
   "/profile-cover-images",
   authenticationMiddleware(),
-  localFileUpload({
-    customPath: "user",
+  cloudFileUpload({
     validation: fileValidation.image,
     fileSize: 1024 * 1024, // 1MB
   }).array("images", 2),

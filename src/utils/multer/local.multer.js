@@ -52,7 +52,6 @@ const localFileUpload = ({ customPath = "general", validation = [], fileSize = 5
   };
 
   return multer({
-    dest: "./temp",
     fileFilter,
     limits: {
       fileSize, // in bytes
