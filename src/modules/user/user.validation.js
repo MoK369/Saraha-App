@@ -63,6 +63,28 @@ const updatePassword = {
     .required(),
 };
 
+const profileImage = {
+  file: Joi.object()
+    .keys({
+      fieldname: generalFields.fileKeys.fieldname.valid("image"),
+      originalname: generalFields.fileKeys.originalname,
+      encoding: generalFields.fileKeys.encoding,
+      mimetype: generalFields.fileKeys.mimetype.valid(
+        ...Object.values(fileValidation.image)
+      ),
+      basePath: generalFields.fileKeys.basePath,
+      finalPath: generalFields.fileKeys.finalPath,
+      destination: generalFields.fileKeys.destination,
+      filename: generalFields.fileKeys.fieldname,
+      path: generalFields.fileKeys.path,
+      size: generalFields.fileKeys.size.max(1024 * 512), // 512KB
+    })
+    .required()
+    .messages({
+      "any.required": "image field is required with single image file",
+    }),
+};
+
 const profileCoverImages = {
   files: Joi.array()
     .items(
@@ -78,7 +100,7 @@ const profileCoverImages = {
         destination: generalFields.fileKeys.destination,
         filename: generalFields.fileKeys.fieldname,
         path: generalFields.fileKeys.path,
-        size: generalFields.fileKeys.size,
+        size: generalFields.fileKeys.size.max(1024 * 1024), // 1MB
       })
     )
     .min(1)
@@ -98,6 +120,7 @@ const userValidators = {
   deleteAccount,
   updatePassword,
   logout,
+  profileImage,
   profileCoverImages,
 };
 

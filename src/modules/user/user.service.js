@@ -296,5 +296,6 @@ export const updateProfileCoverImages = asyncHandler(async (req, res, next) => {
   user.coverImages = user.coverImages?.map((filePath) =>
     user.getImageUrl(req, filePath)
   );
+  user.profilePicture = user.getImageUrl(req, user.profilePicture);
   return successHandler({ res, body: user });
 });

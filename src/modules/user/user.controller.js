@@ -61,6 +61,7 @@ userRouter.patch(
     customPath: "user",
     validation: fileValidation.image,
   }).single("image"),
+  validationMiddleware({validationSchema: userValidators.profileImage}),
   userService.updateProfileImage
 );
 userRouter.patch(
@@ -69,6 +70,7 @@ userRouter.patch(
   localFileUpload({
     customPath: "user",
     validation: fileValidation.image,
+    fileSize: 1024 * 1024, // 1MB
   }).array("images", 2),
   validationMiddleware({validationSchema: userValidators.profileCoverImages}),
   userService.updateProfileCoverImages

@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "node:path";
 import CustomError from "../custom/error_class.custom.js";
 
-const localFileUpload = ({ customPath = "general", validation = [] } = {}) => {
+const localFileUpload = ({ customPath = "general", validation = [], fileSize = 512 * 1024 } = {}) => {
   /* 
     Not to put this === let basePath = `uploads/${customPath}`; === here because:
     Since localFileUpload() is called once during setup, 
@@ -55,7 +55,7 @@ const localFileUpload = ({ customPath = "general", validation = [] } = {}) => {
     dest: "./temp",
     fileFilter,
     limits: {
-      fileSize: 512000, // in bytes
+      fileSize, // in bytes
     },
     storage,
   });
