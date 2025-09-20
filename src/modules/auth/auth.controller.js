@@ -15,6 +15,11 @@ authRouter.post(
   validationMiddleware({ validationSchema: AuthValidators.signin }),
   authService.signin
 );
+authRouter.post(
+  "/resend-verification-otp",
+  validationMiddleware({ validationSchema: AuthValidators.resendVerificationOtp }),
+  authService.resendVerificationOtp
+);
 authRouter.patch(
   "/confirm-email",
   validationMiddleware({ validationSchema: AuthValidators.confirmEmail }),

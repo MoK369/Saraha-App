@@ -6,7 +6,6 @@ import validationMiddleware from "../../middleware/validation.middleware.js";
 import userValidators from "./user.validation.js";
 import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
-import localFileUpload from "../../utils/multer/local.multer.js";
 import fileValidation from "../../utils/constants/files_validation.constants.js";
 import cloudFileUpload from "../../utils/multer/cloud.multer.js";
 

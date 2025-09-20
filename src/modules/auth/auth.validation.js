@@ -32,6 +32,14 @@ const confirmEmail = {
     .required(),
 };
 
+const resendVerificationOtp = {
+  body: Joi.object()
+    .keys({
+      email: generalFields.email.required(),
+    })
+    .required(),
+};
+
 const signWithGmail = {
   body: Joi.object().keys({
     idToken: generalFields.token.required(),
@@ -67,6 +75,7 @@ const AuthValidators = {
   signin,
   signup,
   confirmEmail,
+  resendVerificationOtp,
   signWithGmail,
   forgotPassword,
   veifyForgotPassword,

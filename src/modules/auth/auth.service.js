@@ -35,7 +35,17 @@ export const signup = asyncHandler(async (req, res, next) => {
 
   await DBService.create({
     model: UserModel,
-    docs: [{ fullName, email, password, phone, gender, confirmEmailOtp }],
+    docs: [
+      {
+        fullName,
+        email,
+        password,
+        phone,
+        gender,
+        confirmEmailOtp,
+        confirmEmailOtpCreatedAt: Date.now(),
+      },
+    ],
   });
 
   emailEvent.emit("confirmEmail", { to: email, otp });
@@ -89,11 +99,7 @@ export const signin = asyncHandler(async (req, res, next) => {
 });
 
 export const confirmEmail = asyncHandler(async (req, res, next) => {
-  const { email, otp } = req.body || {};
-
-  if (!email || !otp) {
-    throw new CustomError("email and otp are required!");
-  }
+  const { email, otp } = req.body;
 
   const user = await DBService.findOne({
     model: UserModel,
@@ -101,6 +107,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
       email,
       confirmEmail: { $exists: false },
       confirmEmailOtp: { $exists: true },
+      confirmEmailOtpCreatedAt: { $exists: true },
     },
   });
 
@@ -111,12 +118,20 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   if (!(await compareHash({ text: otp, cipherText: user.confirmEmailOtp }))) {
     throw new CustomError("invalid otp");
   }
+
+   if (
+    user?.confirmEmailOtpCreatedAt &&
+    Date.now() > user.confirmEmailOtpCreatedAt.getTime() + 10 * 60 * 1000
+  ) {
+    throw new CustomError("otp has expired, please request a new one");
+  }
+
   const updatedUser = await DBService.updateOne({
     model: UserModel,
     filter: { email },
     update: {
       confirmEmail: Date.now(),
-      $unset: { confirmEmailOtp: true },
+      $unset: { confirmEmailOtp: true, confirmEmailOtpCreatedAt: true },
       $inc: { __v: 1 },
     },
   });
@@ -124,6 +139,45 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
   if (updatedUser.matchedCount)
     return successHandler({ res, message: "account verified!" });
   else throw new CustomError("failed to verify email");
+});
+
+export const resendVerificationOtp = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await DBService.findOne({
+    model: UserModel,
+    filter: {
+      email,
+      confirmEmail: { $exists: false },
+      confirmEmailOtp: { $exists: true },
+      confirmEmailOtpCreatedAt: { $exists: true },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError("invalid accout or already verified");
+  }
+
+  if (user.confirmEmailOtpCreatedAt) {
+    if (
+      user?.confirmEmailOtpCounts >= 5 &&
+      Date.now() < user.confirmEmailOtpCreatedAt.getTime() + 5 * 60 * 1000
+    ) {
+      throw new CustomError("too many requests, please try after a while", 429);
+    }
+
+    Date.now() < user.confirmEmailOtpCreatedAt.getTime() + 3 * 60 * 1000
+      ? (user.confirmEmailOtpCounts += 1)
+      : (user.confirmEmailOtpCounts = 0);
+  }
+
+  const otp = customAlphabet("0123456789", 6)();
+  user.confirmEmailOtp = await hash({ plainText: otp });
+  user.confirmEmailOtpCreatedAt = Date.now();
+  await user.save();
+
+  emailEvent.emit("confirmEmail", { to: email, otp });
+  return successHandler({ res, message: "OTP has been sent to this email" });
 });
 
 export const signupWithGmail = asyncHandler(async (req, res, next) => {

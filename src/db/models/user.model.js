@@ -56,6 +56,8 @@ const userSchema = new mongoose.Schema(
     picture: String,
     confirmEmail: Date,
     confirmEmailOtp: String,
+    confirmEmailOtpCreatedAt: Date,
+    confirmEmailOtpCounts: Number,
     deletedAt: Date,
     deletedBy: {
       type: Types.ObjectId,

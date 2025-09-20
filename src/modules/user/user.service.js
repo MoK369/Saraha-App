@@ -11,10 +11,7 @@ import { encryptText } from "../../utils/security/encrypt.security.js";
 import { logoutEnum, roleEnum } from "../../utils/constants/enum.constants.js";
 import { compareHash, hash } from "../../utils/security/hash.security.js";
 import TokenModel from "../../db/models/token.model.js";
-import fs from "fs/promises";
-import path from "node:path";
 import {
-  cloudinaryCloud,
   cloudinaryDeleteFile,
   cloudinaryDeleteFiles,
   cloudinaryDeleteFolder,
