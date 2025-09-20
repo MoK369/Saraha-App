@@ -13,7 +13,7 @@ const authorizationMiddleware = ({ accessRole = [] } = {}) => {
     if (!accessRole.includes(req.user.role)) {
       throw new CustomError("Not Authorized Account", 403);
     }
-    next();
+    return next();
   });
 };
 

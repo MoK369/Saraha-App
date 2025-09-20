@@ -1,9 +1,34 @@
+import { populate } from "dotenv";
+
 const DBService = {
   findOne: async ({ model, filter = {}, select = "", populate = [] } = {}) => {
     return await model.findOne(filter).select(select).populate(populate);
   },
   findById: async ({ model, id, select = "", populate = [] } = {}) => {
     return await model.findById(id).select(select).populate(populate);
+  },
+  findOneAndUpdate: async ({
+    model,
+    filter = {},
+    update = {},
+    options = { runValidators: true, new: true },
+    select = "",
+    populate = [],
+  } = {}) => {
+    console.log({ update });
+    return await model
+      .findOneAndUpdate(
+        filter,
+        {
+          ...update,
+          $inc: {
+            __v: 1,
+          },
+        },
+        options
+      )
+      .select(select)
+      .populate(populate);
   },
   updateOne: async ({
     model,
@@ -20,6 +45,9 @@ const DBService = {
   },
   create: async ({ model, docs = [], options = {} } = {}) => {
     return await model.create(docs, options);
+  },
+  deleteOne: async ({ model, filter = {}, options = {} }) => {
+    return await model.deleteOne(filter, options);
   },
 };
 

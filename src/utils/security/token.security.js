@@ -1,11 +1,13 @@
 import jwt from "jsonwebtoken";
 import { bearerKeyEnum, roleEnum } from "../constants/enum.constants.js";
+import { nanoid } from "nanoid";
+import TokenModel from "../../db/models/token.model.js";
 
 export const generateToken = ({
   payload,
   secretKey,
   options = {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+    expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
   },
 }) => {
   return jwt.sign(payload, secretKey, options);
@@ -37,17 +39,35 @@ export const generateLoginCredentials = ({ user } = {}) => {
     user.role !== roleEnum.user ? bearerKeyEnum.system : bearerKeyEnum.bearer;
 
   const tokenKeys = getTekenKeys({ signatureLevel });
-
+  const jwtid = nanoid();
   const accessToken = generateToken({
     payload: { id: user.id },
     secretKey: tokenKeys.accessTokenKey,
+    options: {
+      jwtid,
+      expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+    },
   });
 
   const refreshToken = generateToken({
     payload: { id: user.id },
     secretKey: tokenKeys.refreshTokenKey,
-    options: { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },
+    options: { jwtid, expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN) },
   });
 
   return { accessToken, refreshToken };
+};
+
+export const revokeToken = async ({ payload }) => {
+  await DBService.create({
+    model: TokenModel,
+    docs: [
+      {
+        jti: payload.jti,
+        expiresIn: payload.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+        userId: payload.id,
+      },
+    ],
+  });
+  return true;
 };

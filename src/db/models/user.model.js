@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import {
   genderEnum,
   providerEnum,
@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
         return this.provider === providerEnum.system;
       },
     },
+    oldPasswords: [String],
     phone: {
       type: String,
       required: function () {
@@ -55,6 +56,25 @@ const userSchema = new mongoose.Schema(
     picture: String,
     confirmEmail: Date,
     confirmEmailOtp: String,
+    confirmEmailOtpCreatedAt: Date,
+    confirmEmailOtpCounts: Number,
+    deletedAt: Date,
+    deletedBy: {
+      type: Types.ObjectId,
+      ref: "User",
+    },
+    restoredAt: Date,
+    restoredBy: {
+      type: Types.ObjectId,
+      ref: "User",
+    },
+    forgotPasswordOtp: String,
+    forgotPasswordOtpCreatedAt: Date,
+    forgotPasswordOtpVerifiedAt: Date,
+    forgotPasswordOtpCounts: Number,
+    changeCredentialsTime: Date,
+    profilePicture: { secure_url: String, public_id: String },
+    coverImages: [{ secure_url: String, public_id: String }],
   },
   {
     timestamps: true,
@@ -79,15 +99,24 @@ userSchema.methods.toJSON = function () {
   delete restObj.firstName;
   delete restObj.lastName;
   delete restObj.password;
+  delete restObj.oldPasswords;
+  delete restObj.forgotPasswordOtpCreatedAt;
+  delete restObj.forgotPasswordOtpCounts;
   restObj.phone = decryptText({
     ciphertext: restObj.phone,
     secretKey: process.env.SECRETE_KEY,
   });
+  restObj.profilePicture = restObj.profilePicture?.secure_url;
+  restObj.coverImages = restObj.coverImages?.map((img) => img.secure_url);
   return {
     id,
     fullName,
     ...restObj,
   };
+};
+
+userSchema.methods.getImageUrl = function (req, imagePath) {
+  return `${req.protocol}://${req.get("host")}/${imagePath}`;
 };
 
 const UserModel = mongoose.model("User", userSchema);
