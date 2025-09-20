@@ -1,3 +1,8 @@
+export const moodEnum = {
+  development: "Development",
+  production: "Production",
+};
+
 export const genderEnum = {
   male: "male",
   female: "female",
@@ -21,4 +26,10 @@ export const tokenTypeEnum = {
 export const providerEnum = {
   system: "system",
   google: "google",
+};
+
+export const logoutEnum = {
+  logoutFromAll: "logoutFromAll",
+  logout: "logout",
+  stayLoggedIn: "stayLoggedIn",
 };
