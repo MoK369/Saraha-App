@@ -5,7 +5,8 @@ import { moodEnum } from "../utils/constants/enum.constants.js";
 const validationMiddleware = ({ validationSchema }) => {
   return asyncHandler(async (req, res, next) => {
     const errorObject = {};
-
+    console.log({body:req.body});
+    
     for (const key of Object.keys(validationSchema)) {
       const validationResult = validationSchema[key].validate(req[key], {
         abortEarly: false,
