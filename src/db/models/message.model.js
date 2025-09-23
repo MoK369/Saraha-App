@@ -25,16 +25,18 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    deletedAt: Date,
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-
 messageSchema.methods.toJSON = function () {
-  const {id,...restObj} = this.toObject();
+  const { id, ...restObj } = this.toObject();
   delete restObj._id;
   restObj.attachments = restObj.attachments?.map((img) => img.secure_url);
-  return {id,...restObj};
-}
+  console.log({ restObj });
+
+  return { id, ...restObj };
+};
 
 const MessageModel = mongoose.model("Message", messageSchema);
 MessageModel.syncIndexes();

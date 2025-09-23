@@ -93,6 +93,12 @@ userSchema
     return `${this.firstName} ${this.lastName}`;
   });
 
+userSchema.virtual("messages", {
+  localField: "_id",
+  foreignField: "receiverId",
+  ref: "Message",
+});
+
 userSchema.methods.toJSON = function () {
   const { id, fullName, ...restObj } = this.toObject();
   delete restObj._id;
@@ -102,10 +108,11 @@ userSchema.methods.toJSON = function () {
   delete restObj.oldPasswords;
   delete restObj.forgotPasswordOtpCreatedAt;
   delete restObj.forgotPasswordOtpCounts;
-  restObj.phone = decryptText({
-    ciphertext: restObj.phone,
-    secretKey: process.env.SECRETE_KEY,
-  });
+  if (restObj.phone)
+    restObj.phone = decryptText({
+      ciphertext: restObj?.phone,
+      secretKey: process.env.SECRETE_KEY,
+    });
   restObj.profilePicture = restObj.profilePicture?.secure_url;
   restObj.coverImages = restObj.coverImages?.map((img) => img.secure_url);
   return {

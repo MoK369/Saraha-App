@@ -32,8 +32,29 @@ const sendMessage = {
     .max(2),
 };
 
+const getMessageById = {
+  params: Joi.object().keys({
+    id: generalFields.objectId.required(),
+  }),
+};
+
+const deleteMessage = {
+  params: Joi.object().keys({
+    id: generalFields.objectId.required(),
+  }),
+};
+
+const restoreMessage = {
+  params: Joi.object().keys({
+    id: generalFields.objectId.required(),
+  }),
+};
+
 const messageValidators = {
   sendMessage,
+  getMessageById,
+  deleteMessage,
+  restoreMessage
 };
 
 export default messageValidators;

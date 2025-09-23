@@ -20,7 +20,13 @@ import {
 } from "../../utils/multer/cloudinary.js";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
-  return successHandler({ res, body: req.user });
+  const user = await DBService.findById({
+    model: UserModel,
+    id: req.user.id,
+    populate: [{ path: "messages", select:"id content attachments -receiverId" }],
+  });
+  user.messages = user.messages?.map((message) => message.toJSON());
+  return successHandler({ res, body: user });
 });
 
 export const shareUserProfile = asyncHandler(async (req, res, next) => {
