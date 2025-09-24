@@ -1,6 +1,9 @@
 import { populate } from "dotenv";
 
 const DBService = {
+  find: async ({ model, filter = {}, select = "", populate = [] } = {}) => {
+    return await model.find(filter).select(select).populate(populate);
+  },
   findOne: async ({ model, filter = {}, select = "", populate = [] } = {}) => {
     return await model.findOne(filter).select(select).populate(populate);
   },
@@ -15,7 +18,6 @@ const DBService = {
     select = "",
     populate = [],
   } = {}) => {
-    console.log({ update });
     return await model
       .findOneAndUpdate(
         filter,

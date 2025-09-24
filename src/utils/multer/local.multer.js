@@ -17,10 +17,8 @@ const localFileUpload = ({ customPath = "general", validation = [], fileSize = 5
       if (req.user?.id) {
         basePath += `/${req.user.id}`;
       }
-      console.log({ basePathAfter: basePath });
 
       const fullPath = path.resolve(`./src/${basePath}`);
-      console.log({ fullPath });
 
       await fs.access(fullPath).catch(async (error) => {
         if (error.code == "ENOENT") {
@@ -31,7 +29,6 @@ const localFileUpload = ({ customPath = "general", validation = [], fileSize = 5
       callback(null, fullPath);
     },
     filename: function (req, file, callback) {
-      console.log({ file });
 
       const uniqueFileName =
         `${Date.now()}` +

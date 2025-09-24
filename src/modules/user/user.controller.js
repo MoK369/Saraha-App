@@ -9,7 +9,7 @@ import endpointAuth from "./user.authorization.js";
 import fileValidation from "../../utils/constants/files_validation.constants.js";
 import cloudFileUpload from "../../utils/multer/cloud.multer.js";
 
-const userRouter = Router();
+const userRouter = Router({ caseSensitive: true });
 userRouter.get(
   "/profile",
   authenticationMiddleware(),
@@ -60,7 +60,7 @@ userRouter.patch(
   cloudFileUpload({
     validation: fileValidation.image,
   }).single("image"),
-  validationMiddleware({validationSchema: userValidators.profileImage}),
+  validationMiddleware({ validationSchema: userValidators.profileImage }),
   userService.updateProfileImage
 );
 userRouter.patch(
@@ -70,7 +70,7 @@ userRouter.patch(
     validation: fileValidation.image,
     fileSize: 1024 * 1024, // 1MB
   }).array("images", 2),
-  validationMiddleware({validationSchema: userValidators.profileCoverImages}),
+  validationMiddleware({ validationSchema: userValidators.profileCoverImages }),
   userService.updateProfileCoverImages
 );
 

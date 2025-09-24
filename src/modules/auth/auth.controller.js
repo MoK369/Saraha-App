@@ -3,7 +3,7 @@ import * as authService from "./auth.service.js";
 import validationMiddleware from "../../middleware/validation.middleware.js";
 import AuthValidators from "./auth.validation.js";
 
-const authRouter = Router();
+const authRouter = Router({ caseSensitive: true });
 
 authRouter.post(
   "/signup",
