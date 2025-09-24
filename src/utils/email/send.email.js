@@ -30,7 +30,6 @@ async function sendEmail({
     attachments,
   });
 
-  console.log("Message sent:", info.messageId);
 }
 
 export default sendEmail;

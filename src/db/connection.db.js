@@ -7,7 +7,7 @@ async function checkDbConnection() {
     return true;
   } catch (error) {
     console.log("Failed to Connect to DB ⛔️");
-    console.log({ dbError: error });
+    //console.log({ dbError: error });
     return false;
   }
 }

@@ -12,8 +12,6 @@ const authenticationMiddleware = ({
   tokenType = tokenTypeEnum.access,
 } = {}) => {
   return asyncHandler(async (req, res, next) => {
-    console.log("executing ------------");
-
     const validationResult = Joi.object()
       .keys({
         authorization: generalFields.authorization.required(),
@@ -39,10 +37,8 @@ const authenticationMiddleware = ({
     if (!bearerKey || !token) {
       throw new CustomError("missing token parts", 401);
     }
-    console.log({ bearerKey, token });
 
     const tokenKeys = getTekenKeys({ signatureLevel: bearerKey });
-    console.log({ tokenKeys });
 
     const payload = verifyToken({
       token,
@@ -85,7 +81,6 @@ const authenticationMiddleware = ({
 
     req.user = user;
     req.payload = payload;
-    console.log(req.user);
 
     return next();
   });
