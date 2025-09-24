@@ -12,8 +12,8 @@ import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 
 async function bootstrap() {
-  const filePath = path.resolve("./src/config/.env.dev");
-  dotenv.config({ path: filePath });
+  //const filePath = path.resolve("./src/config/.env.dev");
+  //dotenv.config({ path: filePath });
 
   const app = express();
   const port = process.env.PORT;
