@@ -8,7 +8,9 @@ import authenticationMiddleware from "../../middleware/authentication.middleware
 import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./message.authorization.js";
 
-const messageRouter = Router();
+const messageRouter = Router({
+  caseSensitive: true,
+});
 
 messageRouter.post(
   "/:recieverId/sender",

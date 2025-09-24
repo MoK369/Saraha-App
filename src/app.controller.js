@@ -7,6 +7,9 @@ import authController from "./modules/auth/auth.controller.js";
 import userController from "./modules/user/user.controller.js";
 import messageController from "./modules/message/message.controller.js";
 import cors from "cors";
+import morgan from "morgan";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
 
 async function bootstrap() {
   const filePath = path.resolve("./src/config/.env.dev");
@@ -15,8 +18,56 @@ async function bootstrap() {
   const app = express();
   const port = process.env.PORT;
 
-  // cors origin
+  // cors origins
+  //var whitelist = process.env.CORS_ORIGINS?.split(",") || [];
+
+  // Solve problem of Private Network Access if the front-end was public and the back-end was local or vise versa
+  // app.use(async (req, res, next) => {
+  //   if (!whitelist.includes(`${req.header("origin")}`)) {
+  //     return next(new Error("Not Allowed By CORS", { status: 403 }));
+  //   }
+  //   for (const origin of whitelist) {
+  //     if (`${req.header("origin")}` == origin) {
+  //       res.header("Access-Control-Allow-Origin", origin);
+  //       break;
+  //     }
+  //   }
+  //   res.header("Access-Control-Allow-Headers", "*");
+  //   res.header("Access-Control-Allow-Private-Network", "true");
+  //   res.header("Access-Control-Allow-Methods", "*");
+  //   console.log("Origin Work");
+  //   next();
+  // });
+
+  // var corsOptions = {
+  //   origin: function (origin, callback) {
+  //     console.log({ origin });
+  //     if (whitelist.indexOf(`${origin}`) !== -1) {
+  //       callback(null, true);
+  //     } else {
+  //       callback(new CustomError("Not allowed by CORS", 400));
+  //     }
+  //   },
+  // };
   app.use(cors());
+  // ================================
+
+  // Helmet Middleware
+  app.use(helmet());
+
+  // RateLimiter Middleware
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per windowMs
+      standardHeaders: "draft-8", // Return rate limit info in the `RateLimit-*` headers
+      legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    })
+  );
+
+  // morgan logger
+  app.use(morgan("dev"));
+  //console.log(morgan("common"));
 
   const result = await checkDbConnection();
   if (!result) {
