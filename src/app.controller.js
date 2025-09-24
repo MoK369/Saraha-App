@@ -35,13 +35,11 @@ async function bootstrap() {
   //   res.header("Access-Control-Allow-Headers", "*");
   //   res.header("Access-Control-Allow-Private-Network", "true");
   //   res.header("Access-Control-Allow-Methods", "*");
-  //   console.log("Origin Work");
   //   next();
   // });
 
   // var corsOptions = {
   //   origin: function (origin, callback) {
-  //     console.log({ origin });
   //     if (whitelist.indexOf(`${origin}`) !== -1) {
   //       callback(null, true);
   //     } else {
@@ -67,7 +65,6 @@ async function bootstrap() {
 
   // morgan logger
   app.use(morgan("dev"));
-  //console.log(morgan("common"));
 
   const result = await checkDbConnection();
   if (!result) {
@@ -95,7 +92,6 @@ async function bootstrap() {
   app.listen(port, (error) => {
     if (error) {
       console.log("Fail Running Server");
-      console.log(error);
     } else console.log(`Server is Running on PORT ${port}`);
   });
 }

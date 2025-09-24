@@ -56,7 +56,6 @@ const generalFields = {
         "authorization must consists of one word either [Bearer|System] plus a space plus token that consists of three segments separated by dot, each has any number of characters in [A-Za-z0-9-_]",
     }),
   objectId: Joi.string().custom((value, helper) => {
-    console.log(value);
     return Types.ObjectId.isValid(value) || helper.message("invalid objectId");
   }),
   fileKeys: {

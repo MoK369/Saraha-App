@@ -1,9 +1,9 @@
 import ConstantValues from "../constants/values.constants.js";
 
 const errorHandler = (error, req, res, next) => {
-  console.log({ error });
-  console.log({ errorName: error.name });
-  console.log({ errorMessage: error.message });
+  // console.log({ error });
+  // console.log({ errorName: error.name });
+  // console.log({ errorMessage: error.message });
   let statusCode;
   switch (error.name) {
     case "ValidationError":

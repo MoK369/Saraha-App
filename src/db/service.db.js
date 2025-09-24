@@ -18,7 +18,6 @@ const DBService = {
     select = "",
     populate = [],
   } = {}) => {
-    console.log({ update });
     return await model
       .findOneAndUpdate(
         filter,

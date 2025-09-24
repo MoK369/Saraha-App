@@ -33,7 +33,6 @@ messageSchema.methods.toJSON = function () {
   const { id, ...restObj } = this.toObject();
   delete restObj._id;
   restObj.attachments = restObj.attachments?.map((img) => img.secure_url);
-  console.log({ restObj });
 
   return { id, ...restObj };
 };

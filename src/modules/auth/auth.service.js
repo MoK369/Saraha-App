@@ -185,7 +185,6 @@ export const signupWithGmail = asyncHandler(async (req, res, next) => {
   if (!idToken) {
     throw new CustomError("idToken is missing");
   }
-  console.log({ idToken });
 
   const { name, email, picture, email_verified } = await verifyGoogleAccount({
     idToken,
@@ -228,12 +227,10 @@ export const signinWithGmail = asyncHandler(async (req, res, next) => {
   if (!idToken) {
     throw new CustomError("idToken is missing");
   }
-  console.log({ idToken });
 
   const { email, email_verified } = await verifyGoogleAccount({
     idToken,
   });
-  console.log({ email, email_verified });
 
   if (!email_verified) {
     throw new CustomError("email not verified");

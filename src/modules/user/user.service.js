@@ -117,7 +117,6 @@ export const freezeAccount = asyncHandler(async (req, res, next) => {
       },
     },
   });
-  console.log({ result });
 
   if (!result.modifiedCount) {
     throw new CustomError("user not found!", 404);
@@ -144,7 +143,6 @@ export const restoreAccount = asyncHandler(async (req, res, next) => {
       restoredBy: req.user.id,
     },
   });
-  console.log({ result });
 
   if (!result.modifiedCount) {
     throw new CustomError("invalid account or already restored");
@@ -165,7 +163,7 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
   }
 
   await cloudinaryDeleteFolder({ path: `user/${userId}` }).catch((error) => {
-    console.log("error while deleting user files from cloudinary");
+    //console.log("error while deleting user files from cloudinary");
     throw new CustomError(
       "error deleting user files, please try again later",
       500
@@ -192,8 +190,6 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
   }
 
   if (req.user.oldPasswords?.length) {
-    console.log("checking oldPasswords");
-
     for (const elementPassword of req.user.oldPasswords) {
       if (
         await compareHash({
@@ -248,7 +244,6 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 });
 
 export const logout = asyncHandler(async (req, res, next) => {
-  console.log(req.payload);
   const { flag } = req.body || {};
   /*
   {
@@ -297,7 +292,6 @@ export const updateProfileImage = asyncHandler(async (req, res, next) => {
   //   },
   // });
   // user.profilePicture = user.getImageUrl(req, user.profilePicture);
-  console.log({ file: req.file });
 
   const { secure_url, public_id } = await cloudinaryUploadFile({
     file: req.file,
@@ -320,7 +314,6 @@ export const updateProfileImage = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: user });
 });
 export const updateProfileCoverImages = asyncHandler(async (req, res, next) => {
-  console.log({ files: req.files });
 
   // if (req.user?.coverImages && req.files) {
   //   await Promise.all(
