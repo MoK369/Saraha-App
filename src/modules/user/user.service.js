@@ -29,6 +29,21 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: user });
 });
 
+export const getAllUsers = asyncHandler(async (req, res, next) => {
+
+  const users = await DBService.find({
+    model: UserModel,
+    filter: {
+      confirmEmail: { $exists: true },
+    },
+  });
+
+  if (!users) {
+    throw new CustomError("invalid or not verified accounts", 404);
+  }
+  return successHandler({ res, body: users });
+});
+
 export const shareUserProfile = asyncHandler(async (req, res, next) => {
   const { userId } = req.params || {};
 
@@ -37,6 +52,7 @@ export const shareUserProfile = asyncHandler(async (req, res, next) => {
     filter: {
       _id: userId,
       confirmEmail: { $exists: true },
+      deletedAt: { $exists: false },
     },
   });
 

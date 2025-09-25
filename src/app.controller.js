@@ -12,8 +12,8 @@ import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 
 async function bootstrap() {
-  //const filePath = path.resolve("./src/config/.env.dev");
-  //dotenv.config({ path: filePath });
+  const filePath = path.resolve("./src/config/.env.dev");
+  dotenv.config({ path: filePath });
 
   const app = express();
   const port = process.env.PORT;
@@ -78,8 +78,8 @@ async function bootstrap() {
     app.use("/uploads", express.static(path.resolve("./src/uploads")));
     app.use(express.json());
     app.use("/auth", authController);
-    app.use("/user", userController);
-    app.use("/message", messageController);
+    app.use("/users", userController);
+    app.use("/messages", messageController);
     app.all("{/*d}", (req, res, next) => {
       return res.status(404).json({
         success: false,

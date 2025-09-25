@@ -32,8 +32,15 @@ const sendMessage = {
     .max(2),
 };
 
+const getUserMessages = {
+  params: Joi.object().keys({
+    userId: generalFields.objectId.required(),
+  }),
+};
+
 const getMessageById = {
   params: Joi.object().keys({
+    userId: generalFields.objectId,
     id: generalFields.objectId.required(),
   }),
 };
@@ -52,6 +59,7 @@ const restoreMessage = {
 
 const messageValidators = {
   sendMessage,
+  getUserMessages,
   getMessageById,
   deleteMessage,
   restoreMessage
