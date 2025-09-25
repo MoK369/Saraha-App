@@ -3,7 +3,7 @@ import generalFields from "../../utils/constants/fields_validation.constants.js"
 import { logoutEnum } from "../../utils/constants/enum.constants.js";
 import fileValidation from "../../utils/constants/files_validation.constants.js";
 
-const shareUserProfile = {
+const getUserById = {
   params: Joi.object().keys({
     userId: generalFields.objectId.required(),
   }),
@@ -113,7 +113,7 @@ const profileCoverImages = {
 };
 
 const userValidators = {
-  shareUserProfile,
+  getUserById,
   updateBasicProfile,
   freezeAccount,
   restoreAccount,

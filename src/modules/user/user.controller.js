@@ -23,6 +23,13 @@ userRouter.get(
   authenticationMiddleware(),
   userService.getUserProfile
 );
+
+userRouter.get(
+  "/share-profile",
+  authenticationMiddleware(),
+  userService.shareUserProfile
+);
+
 userRouter.get(
   "/refresh-token",
   authenticationMiddleware({ tokenType: tokenTypeEnum.refresh }),
@@ -37,8 +44,8 @@ userRouter.get(
 
 userRouter.get(
   "/:userId",
-  validationMiddleware({ validationSchema: userValidators.shareUserProfile }),
-  userService.shareUserProfile
+  validationMiddleware({ validationSchema: userValidators.getUserById }),
+  userService.getUserById
 );
 
 userRouter.delete(
