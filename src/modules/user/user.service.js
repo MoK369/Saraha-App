@@ -30,6 +30,27 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 });
 
 export const shareUserProfile = asyncHandler(async (req, res, next) => {
+  const profileLInk = `${req.protocol}://${req.host}/users/${req.user.id}`;
+
+  return successHandler({ res,message:"Profile Link Retrieved Successfully!", body: profileLInk });
+});
+
+export const getAllUsers = asyncHandler(async (req, res, next) => {
+
+  const users = await DBService.find({
+    model: UserModel,
+    filter: {
+      confirmEmail: { $exists: true },
+    },
+  });
+
+  if (!users) {
+    throw new CustomError("invalid or not verified accounts", 404);
+  }
+  return successHandler({ res, body: users });
+});
+
+export const getUserById = asyncHandler(async (req, res, next) => {
   const { userId } = req.params || {};
 
   const user = await DBService.findOne({
@@ -37,9 +58,13 @@ export const shareUserProfile = asyncHandler(async (req, res, next) => {
     filter: {
       _id: userId,
       confirmEmail: { $exists: true },
+      deletedAt: { $exists: false },
+      
     },
   });
 
+  console.log({user});
+  
   if (!user) {
     throw new CustomError("invalid or not verified account", 404);
   }
