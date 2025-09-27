@@ -18,12 +18,15 @@ import {
   cloudinaryUploadFile,
   cloudinaryUploadFiles,
 } from "../../utils/multer/cloudinary.js";
+import paginationHandler from "../../utils/handlers/pagination.handler.js";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   const user = await DBService.findById({
     model: UserModel,
     id: req.user.id,
-    populate: [{ path: "messages", select:"id content attachments -receiverId" }],
+    populate: [
+      { path: "messages", select: "id content attachments -receiverId" },
+    ],
   });
   user.messages = user.messages?.map((message) => message.toJSON());
   return successHandler({ res, body: user });
@@ -32,22 +35,37 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 export const shareUserProfile = asyncHandler(async (req, res, next) => {
   const profileLInk = `${req.protocol}://${req.host}/users/${req.user.id}`;
 
-  return successHandler({ res,message:"Profile Link Retrieved Successfully!", body: profileLInk });
+  return successHandler({
+    res,
+    message: "Profile Link Retrieved Successfully!",
+    body: profileLInk,
+  });
 });
 
 export const getAllUsers = asyncHandler(async (req, res, next) => {
+  let { pageSize, page } = req.validationValue.query;
 
-  const users = await DBService.find({
+  const result =  await paginationHandler({
     model: UserModel,
-    filter: {
-      confirmEmail: { $exists: true },
-    },
+    filter: { confirmEmail: { $exists: true } },
+    pageSize,
+    page,
+    sort: { createdAt: -1 },
   });
 
-  if (!users) {
-    throw new CustomError("invalid or not verified accounts", 404);
+  if (!result.dataItems?.length) {
+    throw new CustomError("No accounts found", 404);
   }
-  return successHandler({ res, body: users });
+  return successHandler({
+    res,
+    body: {
+      pageSize,
+      page,
+      tatalPages: result.totalPages,
+      total: result.totalCount,
+      users: result.dataItems,
+    },
+  });
 });
 
 export const getUserById = asyncHandler(async (req, res, next) => {
@@ -59,10 +77,9 @@ export const getUserById = asyncHandler(async (req, res, next) => {
       _id: userId,
       confirmEmail: { $exists: true },
       deletedAt: { $exists: false },
-      
     },
   });
-  
+
   if (!user) {
     throw new CustomError("invalid or not verified account", 404);
   }
@@ -337,7 +354,6 @@ export const updateProfileImage = asyncHandler(async (req, res, next) => {
   return successHandler({ res, body: user });
 });
 export const updateProfileCoverImages = asyncHandler(async (req, res, next) => {
-
   // if (req.user?.coverImages && req.files) {
   //   await Promise.all(
   //     req.user.coverImages.map((filePath) =>

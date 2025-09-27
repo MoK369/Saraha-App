@@ -39,6 +39,7 @@ userRouter.get(
 userRouter.get(
   "/",
   combinedAuth({accessRole: endpointAuth.getAllUsers}),
+  validationMiddleware({ validationSchema: userValidators.getAllUsers }),
   userService.getAllUsers
 );
 
