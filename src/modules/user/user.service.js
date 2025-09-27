@@ -62,8 +62,6 @@ export const getUserById = asyncHandler(async (req, res, next) => {
       
     },
   });
-
-  console.log({user});
   
   if (!user) {
     throw new CustomError("invalid or not verified account", 404);

@@ -92,7 +92,6 @@ export const getAllMessages = asyncHandler(async (req, res, next) => {
 });
 
 export const getMessageById = asyncHandler(async (req, res, next) => {
-  console.log("hello from getMessageById============");
   const { userId, id } = req.params;
 
   if (userId && req.user.role !== roleEnum.admin) {
