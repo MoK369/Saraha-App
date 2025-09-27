@@ -8,13 +8,28 @@ import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
 import fileValidation from "../../utils/constants/files_validation.constants.js";
 import cloudFileUpload from "../../utils/multer/cloud.multer.js";
+import authorizationMiddleware from "../../middleware/authorization.middleware.js";
+import messageRouter from "../message/message.controller.js";
 
 const userRouter = Router({ caseSensitive: true });
+
+userRouter.use(
+  "/:userId/messages",
+  messageRouter
+);
+
 userRouter.get(
   "/profile",
   authenticationMiddleware(),
   userService.getUserProfile
 );
+
+userRouter.get(
+  "/share-profile",
+  authenticationMiddleware(),
+  userService.shareUserProfile
+);
+
 userRouter.get(
   "/refresh-token",
   authenticationMiddleware({ tokenType: tokenTypeEnum.refresh }),
@@ -22,9 +37,15 @@ userRouter.get(
 );
 
 userRouter.get(
+  "/",
+  combinedAuth({accessRole: endpointAuth.getAllUsers}),
+  userService.getAllUsers
+);
+
+userRouter.get(
   "/:userId",
-  validationMiddleware({ validationSchema: userValidators.shareUserProfile }),
-  userService.shareUserProfile
+  validationMiddleware({ validationSchema: userValidators.getUserById }),
+  userService.getUserById
 );
 
 userRouter.delete(

@@ -10,6 +10,7 @@ import endpointAuth from "./message.authorization.js";
 
 const messageRouter = Router({
   caseSensitive: true,
+  mergeParams: true,
 });
 
 messageRouter.post(
@@ -33,6 +34,15 @@ messageRouter.post(
   messageService.sendMessage
 );
 
+// Get all messages of a user (admin only)
+messageRouter.get(
+  "/",
+  combinedAuth({ accessRole: endpointAuth.getUserMessages }),
+  validationMiddleware({ validationSchema: messageValidators.getUserMessages }),
+  messageService.getUserMessages
+);
+
+// Get all log in user messages
 messageRouter.get(
   "/all-messages",
   authenticationMiddleware(),
