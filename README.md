@@ -1,7 +1,3 @@
-Great! Based on your project details, `.env` structure, and the folder layout from the image, here's a **fully formatted GitHub README.md** file using proper Markdown syntax, emojis, and sections:
-
----
-
 # 🌐 Saraha App - Node.js Backend
 
 Saraha App is a secure and scalable backend API built with Node.js and Express, designed for anonymous messaging. It supports traditional email/password authentication and Google login, with robust validation, encryption, and email verification mechanisms.
@@ -152,7 +148,3 @@ CORS_ORIGINS=
 ## 📄 License
 
 This project is licensed under the **MIT License**.
-
----
-
-Would you like me to generate this as a downloadable `README.md` file for you now?
