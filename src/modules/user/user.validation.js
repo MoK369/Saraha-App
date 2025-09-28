@@ -8,6 +8,12 @@ const getUserById = {
     userId: generalFields.objectId.required(),
   }),
 };
+const getAllUsers = {
+  query: Joi.object().keys({
+    pageSize: generalFields.pageSize,
+    page: generalFields.pageNum,
+  }).required(),
+};
 
 const updateBasicProfile = {
   body: Joi.object()
@@ -122,6 +128,7 @@ const userValidators = {
   logout,
   profileImage,
   profileCoverImages,
+  getAllUsers
 };
 
 export default userValidators;

@@ -46,6 +46,7 @@ messageRouter.get(
 messageRouter.get(
   "/all-messages",
   authenticationMiddleware(),
+  validationMiddleware({ validationSchema: messageValidators.getAllMessages }),
   messageService.getAllMessages
 );
 

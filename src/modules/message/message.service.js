@@ -4,6 +4,7 @@ import DBService from "../../db/service.db.js";
 import { roleEnum } from "../../utils/constants/enum.constants.js";
 import CustomError from "../../utils/custom/error_class.custom.js";
 import asyncHandler from "../../utils/handlers/async.handler.js";
+import paginationHandler from "../../utils/handlers/pagination.handler.js";
 import successHandler from "../../utils/handlers/success.handler.js";
 import { cloudinaryUploadFiles } from "../../utils/multer/cloudinary.js";
 
@@ -52,42 +53,62 @@ export const sendMessage = asyncHandler(async (req, res, next) => {
 
 export const getUserMessages = asyncHandler(async (req, res, next) => {
   const { userId } = req.params;
-  let messages = await DBService.find({
+  const { page, pageSize } = req.validationValue.query;
+
+ const result = await paginationHandler({
     model: MessageModel,
     filter: { receiverId: userId },
-    options: { sort: { createdAt: -1 } },
+    page,
+    pageSize,
     select: "-updatedAt",
     populate: [
       { path: "senderId", select: "email lastName firstName profilePicture" },
     ],
   });
 
-  if (!messages.length) {
-    throw new CustomError("No messages found for this user", 404);
+  if (!result.dataItems?.length) {
+    throw new CustomError("No messages found", 404);
   }
 
   return successHandler({
     res,
     message: "Messages fetched successfully",
-    body: messages,
+    body: {
+      page: result.currentPage,
+      pageSize: result.pageSize,
+      totalPages: result.totalPages,
+      totalMessages: result.totalCount,
+      messages: result.dataItems,
+    },
   });
 });
 
 export const getAllMessages = asyncHandler(async (req, res, next) => {
-  let messages = await DBService.find({
+  const {page, pageSize} = req.validationValue.query;
+
+  const result = await paginationHandler({
     model: MessageModel,
     filter: { receiverId: req.user.id, deletedAt: { $exists: false } },
-    options: { sort: { createdAt: -1 } },
-    select: "-updatedAt",
+    page,
+    pageSize,
     populate: [
       { path: "senderId", select: "email lastName firstName profilePicture" },
-    ],
-  });
+    ]});
+
+  if (!result.dataItems?.length) {
+    throw new CustomError("No messages found", 404);
+  }
 
   return successHandler({
     res,
     message: "Messages fetched successfully",
-    body: messages,
+    body: {
+      page: result.currentPage,
+      pageSize: result.pageSize,
+      totalPages: result.totalPages,
+      totalMessages: result.totalCount,
+      messages: result.dataItems,
+    },
   });
 });
 
