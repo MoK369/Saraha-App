@@ -70,5 +70,7 @@ const generalFields = {
     path: Joi.string().required(),
     size: Joi.number().positive().required(),
   },
+  pageSize: Joi.number().integer().positive().min(1).max(100).default(5),
+  pageNum: Joi.number().integer().positive().min(1).default(1)
 };
 export default generalFields;
