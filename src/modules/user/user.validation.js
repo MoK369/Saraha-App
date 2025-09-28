@@ -10,8 +10,8 @@ const getUserById = {
 };
 const getAllUsers = {
   query: Joi.object().keys({
-    pageSize: Joi.number().min(1).max(100).default(5),
-    page: Joi.number().min(1).default(1),
+    pageSize: generalFields.pageSize,
+    page: generalFields.pageNum,
   }).required(),
 };
 

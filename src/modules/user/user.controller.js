@@ -8,7 +8,6 @@ import combinedAuth from "../../middleware/combined_auth.meddleware.js";
 import endpointAuth from "./user.authorization.js";
 import fileValidation from "../../utils/constants/files_validation.constants.js";
 import cloudFileUpload from "../../utils/multer/cloud.multer.js";
-import authorizationMiddleware from "../../middleware/authorization.middleware.js";
 import messageRouter from "../message/message.controller.js";
 
 const userRouter = Router({ caseSensitive: true });

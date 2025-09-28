@@ -24,11 +24,11 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
   const user = await DBService.findById({
     model: UserModel,
     id: req.user.id,
-    populate: [
-      { path: "messages", select: "id content attachments -receiverId" },
-    ],
+    // populate: [
+    //   { path: "messages", select: "id content attachments -receiverId" },
+    // ],
   });
-  user.messages = user.messages?.map((message) => message.toJSON());
+  //user.messages = user.messages?.map((message) => message.toJSON());
   return successHandler({ res, body: user });
 });
 
@@ -203,7 +203,6 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
   }
 
   await cloudinaryDeleteFolder({ path: `user/${userId}` }).catch((error) => {
-    //console.log("error while deleting user files from cloudinary");
     throw new CustomError(
       "error deleting user files, please try again later",
       500

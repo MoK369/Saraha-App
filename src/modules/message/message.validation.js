@@ -36,6 +36,17 @@ const getUserMessages = {
   params: Joi.object().keys({
     userId: generalFields.objectId.required(),
   }),
+  query: Joi.object().keys({
+    page: generalFields.pageNum,
+    pageSize: generalFields.pageSize,
+  }),
+};
+
+const getAllMessages = {
+  query: Joi.object().keys({
+    page: generalFields.pageNum,
+    pageSize: generalFields.pageSize,
+  }),
 };
 
 const getMessageById = {
@@ -60,6 +71,7 @@ const restoreMessage = {
 const messageValidators = {
   sendMessage,
   getUserMessages,
+  getAllMessages,
   getMessageById,
   deleteMessage,
   restoreMessage
