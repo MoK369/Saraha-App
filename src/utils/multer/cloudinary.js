@@ -45,8 +45,24 @@ export const cloudinaryDeleteFiles = async ({
   return cloudinaryCloud().api.delete_resources(public_ids, options);
 };
 
-export const cloudinaryDeleteFolder = async ({ path = "" } = {}) => {
-  await cloudinaryCloud().api.delete_resources_by_prefix(`${process.env.APP_NAME}/${path}`,);
-  await cloudinaryCloud().api.delete_folder(`${process.env.APP_NAME}/${path}/coverImages`);
-  return cloudinaryCloud().api.delete_folder(`${process.env.APP_NAME}/${path}`);
-}
+export const cloudinaryDeleteFolder = async ({
+  path = "",
+  isThereCoverImages,
+  isThereProfilePicture,
+} = {}) => {
+  if (isThereCoverImages || isThereProfilePicture) {
+    await cloudinaryCloud().api.delete_resources_by_prefix(
+      `${process.env.APP_NAME}/${path}`
+    );
+  }
+  if (isThereCoverImages) {
+    await cloudinaryCloud().api.delete_folder(
+      `${process.env.APP_NAME}/${path}/coverImages`
+    );
+  }
+  if (isThereProfilePicture || isThereCoverImages) {
+    await cloudinaryCloud().api.delete_folder(
+      `${process.env.APP_NAME}/${path}`
+    );
+  }
+};

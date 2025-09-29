@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { bearerKeyEnum, roleEnum } from "../constants/enum.constants.js";
 import { nanoid } from "nanoid";
 import TokenModel from "../../db/models/token.model.js";
+import DBService from "../../db/service.db.js";
 
 export const generateToken = ({
   payload,

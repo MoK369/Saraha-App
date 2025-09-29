@@ -53,7 +53,6 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(providerEnum),
       default: providerEnum.system,
     },
-    picture: String,
     confirmEmail: Date,
     confirmEmailOtp: String,
     confirmEmailOtpCreatedAt: Date,

@@ -8,7 +8,11 @@ import {
 } from "../../utils/security/token.security.js";
 import CustomError from "../../utils/custom/error_class.custom.js";
 import { encryptText } from "../../utils/security/encrypt.security.js";
-import { logoutEnum, roleEnum } from "../../utils/constants/enum.constants.js";
+import {
+  logoutEnum,
+  providerEnum,
+  roleEnum,
+} from "../../utils/constants/enum.constants.js";
 import { compareHash, hash } from "../../utils/security/hash.security.js";
 import TokenModel from "../../db/models/token.model.js";
 import {
@@ -19,6 +23,7 @@ import {
   cloudinaryUploadFiles,
 } from "../../utils/multer/cloudinary.js";
 import paginationHandler from "../../utils/handlers/pagination.handler.js";
+import userEvents from "../../utils/events/delete_user_messages.event.js";
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   const user = await DBService.findById({
@@ -45,7 +50,7 @@ export const shareUserProfile = asyncHandler(async (req, res, next) => {
 export const getAllUsers = asyncHandler(async (req, res, next) => {
   let { pageSize, page } = req.validationValue.query;
 
-  const result =  await paginationHandler({
+  const result = await paginationHandler({
     model: UserModel,
     filter: { confirmEmail: { $exists: true } },
     pageSize,
@@ -202,13 +207,20 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
     throw new CustomError("invalid account", 404);
   }
 
-  await cloudinaryDeleteFolder({ path: `user/${userId}` }).catch((error) => {
-    throw new CustomError(
-      "error deleting user files, please try again later",
-      500
-    );
-  });
+  if (req.user.profilePicture.public_id != providerEnum.google) {
+    await cloudinaryDeleteFolder({
+      path: `user/${userId}`,
+      isThereCoverImages: user?.coverImages?.length,
+      isThereProfilePicture: user?.profilePicture?.public_id,
+    }).catch((error) => {
+      throw new CustomError(
+        "error deleting user files, please try again later",
+        500
+      );
+    });
+  }
 
+  userEvents.emit("userHardDeleted", user.id);
   await DBService.deleteOne({
     model: UserModel,
     filter: {
@@ -344,7 +356,10 @@ export const updateProfileImage = asyncHandler(async (req, res, next) => {
       profilePicture: { secure_url, public_id },
     },
   });
-  if (req.user?.profilePicture?.public_id) {
+  if (
+    req.user?.profilePicture?.public_id &&
+    req.user.profilePicture.public_id != providerEnum.google
+  ) {
     // delete old image from cloudinary
     await cloudinaryDeleteFile({
       public_id: req.user.profilePicture.public_id,
