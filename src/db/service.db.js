@@ -68,6 +68,9 @@ const DBService = {
   deleteOne: async ({ model, filter = {}, options = {} }) => {
     return await model.deleteOne(filter, options);
   },
+  deleteMany: async ({ model, filter = {}, options = {} }) => {
+    return await model.deleteMany(filter, options);
+  },
 };
 
 export default DBService;

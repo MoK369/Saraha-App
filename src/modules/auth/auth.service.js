@@ -206,7 +206,7 @@ export const signupWithGmail = asyncHandler(async (req, res, next) => {
       {
         fullName: name,
         email,
-        picture,
+        profilePicture: { secure_url: picture, public_id: providerEnum.google },
         confirmEmail: Date.now(),
         provider: providerEnum.google,
       },
