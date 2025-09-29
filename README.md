@@ -117,8 +117,8 @@ CORS_ORIGINS=
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/saraha-backend.git
-   cd saraha-backend
+   git clone https://github.com/MoK369/Saraha-App.git
+   cd Saraha-App
    ```
 
 2. **Install dependencies**
