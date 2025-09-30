@@ -296,6 +296,7 @@ export const sendForgotPassword = asyncHandler(async (req, res, next) => {
   emailEvent.emit("forgotPassword", {
     to: email,
     otp,
+    title: "Forgot Password"
   });
   return successHandler({ res, message: "OTP has been sent to this email" });
 });
