@@ -64,7 +64,7 @@ async function bootstrap() {
   );
 
   // morgan logger
-  app.use(morgan("dev"));
+  app.use(morgan("combined"));
 
   const result = await checkDbConnection();
   if (!result) {

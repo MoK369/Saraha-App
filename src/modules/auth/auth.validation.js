@@ -71,6 +71,23 @@ const resetForgotPassword = {
     .required(),
 };
 
+const sendRestoreAccount = {
+  body: Joi.object()
+    .keys({
+      email: generalFields.email.required(),
+    })
+    .required(),
+};
+
+
+const restoreAccount = {
+  body: forgotPassword.body
+    .append({
+      otp: generalFields.otp.required(),
+    })
+    .required(),
+};
+
 const AuthValidators = {
   signin,
   signup,
@@ -80,6 +97,8 @@ const AuthValidators = {
   forgotPassword,
   veifyForgotPassword,
   resetForgotPassword,
+  sendRestoreAccount,
+  restoreAccount,
 };
 
 export default AuthValidators;
