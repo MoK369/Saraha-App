@@ -47,7 +47,7 @@ const verifyEmailTemplate = ({ otp = "", title = "Confirm Email" } = {}) => {
 <body>
   <div class="container">
     <div class="header">
-      <h2>Email Confirmation</h2>
+      <h2>${title}</h2>
     </div>
     <p>Thank you for signing up! Please use the OTP below to verify your email address:</p>
     <div class="otp-box">${otp}</div>

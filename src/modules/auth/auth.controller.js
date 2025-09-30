@@ -17,7 +17,9 @@ authRouter.post(
 );
 authRouter.post(
   "/resend-verification-otp",
-  validationMiddleware({ validationSchema: AuthValidators.resendVerificationOtp }),
+  validationMiddleware({
+    validationSchema: AuthValidators.resendVerificationOtp,
+  }),
   authService.resendVerificationOtp
 );
 authRouter.patch(
@@ -43,14 +45,30 @@ authRouter.post(
 
 authRouter.post(
   "/verify-forgot-password",
-  validationMiddleware({ validationSchema: AuthValidators.veifyForgotPassword }),
+  validationMiddleware({
+    validationSchema: AuthValidators.veifyForgotPassword,
+  }),
   authService.verifyForgotPassword
 );
 
 authRouter.post(
   "/reset-forgot-password",
-  validationMiddleware({ validationSchema: AuthValidators.resetForgotPassword }),
+  validationMiddleware({
+    validationSchema: AuthValidators.resetForgotPassword,
+  }),
   authService.restForgotPassword
+);
+
+authRouter.post(
+  "/request-restore-account",
+  validationMiddleware({ validationSchema: AuthValidators.sendRestoreAccount }),
+  authService.sendRestoreAccount
+);
+
+authRouter.post(
+  "/restore-account",
+  validationMiddleware({ validationSchema: AuthValidators.restoreAccount }),
+  authService.restoreAccount
 );
 
 export default authRouter;

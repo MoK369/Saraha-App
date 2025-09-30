@@ -10,6 +10,7 @@ import { providerEnum } from "../../utils/constants/enum.constants.js";
 import { verifyGoogleAccount } from "../../utils/security/google_token.security.js";
 import emailEvent from "../../utils/events/email.event.js";
 import { customAlphabet } from "nanoid";
+import {Types} from "mongoose";
 
 export const signup = asyncHandler(async (req, res, next) => {
   let { fullName, email, password, phone, gender } = req.body || {};
@@ -48,7 +49,7 @@ export const signup = asyncHandler(async (req, res, next) => {
     ],
   });
 
-  emailEvent.emit("confirmEmail", { to: email, otp });
+  emailEvent.emit("confirmEmail", { to: email, otp, title: "Email Confirmation" });
   return successHandler({
     res,
     statusCode: 201,
@@ -119,7 +120,7 @@ export const confirmEmail = asyncHandler(async (req, res, next) => {
     throw new CustomError("invalid otp");
   }
 
-   if (
+  if (
     user?.confirmEmailOtpCreatedAt &&
     Date.now() > user.confirmEmailOtpCreatedAt.getTime() + 10 * 60 * 1000
   ) {
@@ -238,7 +239,11 @@ export const signinWithGmail = asyncHandler(async (req, res, next) => {
 
   const user = await DBService.findOne({
     model: UserModel,
-    filter: { email, provider: providerEnum.google },
+    filter: {
+      email,
+      provider: providerEnum.google,
+      deletedAt: { $exists: false },
+    },
   });
   if (!user) {
     throw new CustomError("Invalid login data or invalid provider", 404);
@@ -373,4 +378,92 @@ export const restForgotPassword = asyncHandler(async (req, res, next) => {
   });
 
   return successHandler({ res, message: "Passowrd Reset Successfully!" });
+});
+
+export const sendRestoreAccount = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await DBService.findOne({
+    model: UserModel,
+    filter: {
+      email,
+      confirmEmail: { $exists: true },
+      deletedAt: { $exists: true },
+    },
+  });
+  
+  if (!user || !Types.ObjectId.createFromHexString(user.deletedBy.toString()).equals(user.id)) {
+    throw new CustomError("invalid user account", 404);
+  }
+
+  if (Date.now() < user.deletedAt.getTime() + 24 * 60 * 60 * 1000) {
+    throw new CustomError("only account can be restored after 24 hours", 400);
+  }
+
+  const otp = customAlphabet("0123456789", 6)();
+  if (user.restoreAccountOtpCreatedAt) {
+    if (
+      user.restoreAccountOtpCounts == 5 &&
+      Date.now() < user.restoreAccountOtpCreatedAt.getTime() + 5 * 60 * 1000
+    ) {
+      throw new CustomError("too many requests, please try after a while", 429);
+    }
+
+    Date.now() < user.restoreAccountOtpCreatedAt.getTime() + 3 * 60 * 1000
+      ? (user.restoreAccountOtpCounts += 1)
+      : (user.restoreAccountOtpCounts = 0);
+  }
+
+  user.restoreAccountOtp = await hash({ plainText: otp });
+  user.restoreAccountOtpCreatedAt = Date.now();
+  user.restoreAccountOtpVerifiedAt = undefined;
+  await user.save();
+
+  emailEvent.emit("restoreAccount", {
+    to: email,
+    otp,
+    title: "Restore Account",
+  });
+  return successHandler({ res, message: "OTP has been sent to this email" });
+});
+
+export const restoreAccount = asyncHandler(async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  const user = await DBService.findOne({
+    model: UserModel,
+    filter: {
+      email,
+      confirmEmail: { $exists: true },
+      deletedAt: { $exists: true },
+      restoreAccountOtp: { $exists: true },
+    },
+  });
+
+  if (!user) {
+    throw new CustomError("invalid user account", 404);
+  }
+
+  if (
+    Date.now() >= user.restoreAccountOtpCreatedAt.getTime() + 10 * 60 * 1000 ||
+    !(await compareHash({ text: otp, cipherText: user.restoreAccountOtp }))
+  ) {
+    throw new CustomError("invalid otp or otp has expired");
+  }
+
+  await DBService.updateOne({
+    model: UserModel,
+    filter: { email },
+    update: {
+      restoredAt: Date.now(),
+      restoredBy: user.id,
+      $unset: {
+        deletedAt: 1,
+        deletedBy: 1,
+        restoreAccountOtp: 1,
+      },
+    },
+  });
+
+  return successHandler({ res, message: "Account Restored Successfully!" });
 });
