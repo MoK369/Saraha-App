@@ -24,4 +24,14 @@ emailEvent.on("forgotPassword", async (data) => {
   });
 });
 
+emailEvent.on("restoreAccount", async (data) => {
+  await sendEmail({
+    to: data.to,
+    subject: data.subject || "Restore Account",
+    html: verifyEmailTemplate({ otp: data.otp, title: data.title }),
+  }).catch((error) => {
+    console.error(`Failed to send email to ${data.to}`);
+  });
+});
+
 export default emailEvent;
