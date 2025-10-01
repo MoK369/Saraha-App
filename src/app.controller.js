@@ -10,6 +10,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
+import successHandler from "./utils/handlers/success.handler.js";
 
 async function bootstrap() {
   const filePath = path.resolve("./src/config/.env.dev");
@@ -76,6 +77,9 @@ async function bootstrap() {
     });
   } else {
     app.use("/uploads", express.static(path.resolve("./src/uploads")));
+    app.use("/", (req, res) => {
+      return successHandler({ res, message: "Welcome to Saraha App ❤️" });
+    });
     app.use(express.json());
     app.use("/auth", authController);
     app.use("/users", userController);
