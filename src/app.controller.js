@@ -77,7 +77,7 @@ async function bootstrap() {
     });
   } else {
     app.use("/uploads", express.static(path.resolve("./src/uploads")));
-    app.use("/", (req, res) => {
+    app.get("/", (req, res) => {
       return successHandler({ res, message: "Welcome to Saraha App ❤️" });
     });
     app.use(express.json());
