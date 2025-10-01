@@ -207,18 +207,18 @@ export const deleteAccount = asyncHandler(async (req, res, next) => {
     throw new CustomError("invalid account", 404);
   }
 
-  if (req.user.profilePicture.public_id != providerEnum.google) {
-    await cloudinaryDeleteFolder({
-      path: `user/${userId}`,
-      isThereCoverImages: user?.coverImages?.length,
-      isThereProfilePicture: user?.profilePicture?.public_id,
-    }).catch((error) => {
-      throw new CustomError(
-        "error deleting user files, please try again later",
-        500
-      );
-    });
-  }
+  await cloudinaryDeleteFolder({
+    path: `user/${userId}`,
+    isThereCoverImages: user?.coverImages?.length,
+    isThereProfilePicture:
+      user?.profilePicture?.public_id &&
+      user.profilePicture.public_id != providerEnum.google,
+  }).catch((error) => {
+    throw new CustomError(
+      "error deleting user files, please try again later",
+      500
+    );
+  });
 
   userEvents.emit("userHardDeleted", user.id);
   await DBService.deleteOne({
